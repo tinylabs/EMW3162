@@ -1,11 +1,14 @@
 
-BINARY = out.bin
+BINARY = bin/out.bin
+BINARY_STRIPPED = bin/out.stripped.bin
+
 SRCS=apsta.c
 BUILDDIR=build
 BSP=./bsp
 
 ARM=$(BSP)/arm/bin/Linux64/
 CC=$(ARM)arm-none-eabi-gcc
+STRIP=$(ARM)arm-none-eabi-strip	
 
 
 
@@ -25,16 +28,32 @@ CCLINKFLAGS=-Wl,--gc-sections -Wl,-O3 -mthumb -mcpu=cortex-m3 -Wl,-A,thumb -mlit
 
 OBJECTS := $(addprefix $(BUILDDIR)/,$(SRCS:%.c=%.o))
 
-all: $(BINARY)
+all: $(BINARY_STRIPPED)
 
 clean:
-	rm $(BINARY)
-	rm $(OBJECTS)
+	rm -rf ./bin
+	rm -rf ./build
+	
+
+
+
+$(BINARY_STRIPPED): $(BINARY)
+	$(STRIP) -o $@ $(STRIPFLAGS) $<
 
 $(BINARY): $(OBJECTS)
+	@mkdir -p bin
 	$(CC) $(CCLINKFLAGS)  $(OBJECTS) -Wl,--end-group  -o $(BINARY) 
-
-
+	cp $(BSP)/bin/waf_bootloader-NoOS-NoNS-EMW3162-SDIO.stripped.elf ./bin/bootloader.elf
+	cp $(BSP)/bin/DCT.bin ./bin/DCT.bin
+	cp $(BSP)/bin/DCT.stripped.elf ./bin/DCT.elf
+	
 $(BUILDDIR)/%.o: %.c
 	@mkdir -p $(@D)
 	$(CC) $(CCFLAGS)  -o $@ $<
+
+download:
+	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/bootloader.elf" -c shutdown
+	sleep 1
+	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/DCT.elf" -c shutdown
+	sleep 1
+	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.stripped.bin" -c shutdown

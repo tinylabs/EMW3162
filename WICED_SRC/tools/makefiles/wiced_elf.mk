@@ -161,7 +161,6 @@ endef
 # Create targets for resource files
 # Create targets for resource files
 
-ifeq (MXCHIP3162-FreeRTOS-LwIP,$(findstring MXCHIP3162-FreeRTOS-LwIP,$(STRIPPED_LINK_OUTPUT_FILE)))
 ALL_RESOURCES  := ./resources/apps/apsta/ap_top.html \
                       ./resources/images/brcmlogo.png \
                       ./resources/images/brcmlogo_line.png \
@@ -185,7 +184,7 @@ ALL_RESOURCES  := ./resources/apps/apsta/ap_top.html \
                       ./resources/styles/buttons.css \
                       ./resources/firmware/43362/43362A2.bin \
                       ./resources/images/scan_icon.png 
-endif
+
 
 
 $(eval $(if $(ALL_RESOURCES),$(call CREATE_ALL_RESOURCE_TARGETS,$(ALL_RESOURCES))))
@@ -285,14 +284,18 @@ display_map_summary: $(LINK_OUTPUT_FILE)
 # Device Config Table (DCT) binary file target - compiles, links, strips, and objdumps DCT source into a binary output file
 $(LINK_DCT_FILE): $(OUTPUT_DIR)/generated_security_dct.h $(WICED_SDK_DCT_LINK_SCRIPT) $(SOURCE_ROOT)WICED/internal/dct.c $(WICED_SDK_APPLICATION_DCT) $(WICED_SDK_WIFI_CONFIG_DCT_H) $(CONFIG_FILE) | $(PLATFORM_PRE_BUILD_TARGETS)
 	$(QUIET)$(ECHO) Making DCT image
+	$(ECHO) $(CC) $(CPU_CFLAGS) $(COMPILER_SPECIFIC_COMP_ONLY_FLAG)  $(SOURCE_ROOT)WICED/internal/dct.c $(WICED_SDK_DEFINES) $(WICED_SDK_INCLUDES) $(COMPILER_SPECIFIC_DEBUG_CFLAGS)  $(call ADD_COMPILER_SPECIFIC_STANDARD_CFLAGS, ) -I$(OUTPUT_DIR) -I$(SOURCE_ROOT). -o $(OUTPUT_DIR)/internal_dct.o $(COMPILER_SPECIFIC_STDOUT_REDIRECT)
 	$(QUIET)$(CC) $(CPU_CFLAGS) $(COMPILER_SPECIFIC_COMP_ONLY_FLAG)  $(SOURCE_ROOT)WICED/internal/dct.c $(WICED_SDK_DEFINES) $(WICED_SDK_INCLUDES) $(COMPILER_SPECIFIC_DEBUG_CFLAGS)  $(call ADD_COMPILER_SPECIFIC_STANDARD_CFLAGS, ) -I$(OUTPUT_DIR) -I$(SOURCE_ROOT). -o $(OUTPUT_DIR)/internal_dct.o $(COMPILER_SPECIFIC_STDOUT_REDIRECT)
 	$(if $(WICED_SDK_APPLICATION_DCT),$(QUIET)$(CC) $(CPU_CFLAGS) $(COMPILER_SPECIFIC_COMP_ONLY_FLAG)  $(WICED_SDK_APPLICATION_DCT) $(WICED_SDK_DEFINES) $(WICED_SDK_INCLUDES) $(COMPILER_SPECIFIC_DEBUG_CFLAGS)  $(call ADD_COMPILER_SPECIFIC_STANDARD_CFLAGS, ) -I$(OUTPUT_DIR) -I$(SOURCE_ROOT). -o $(OUTPUT_DIR)/app_dct.o)
+	$(if $(WICED_SDK_APPLICATION_DCT),$(ECHO) $(CC) $(CPU_CFLAGS) $(COMPILER_SPECIFIC_COMP_ONLY_FLAG)  $(WICED_SDK_APPLICATION_DCT) $(WICED_SDK_DEFINES) $(WICED_SDK_INCLUDES) $(COMPILER_SPECIFIC_DEBUG_CFLAGS)  $(call ADD_COMPILER_SPECIFIC_STANDARD_CFLAGS, ) -I$(OUTPUT_DIR) -I$(SOURCE_ROOT). -o $(OUTPUT_DIR)/app_dct.o)
 	$(QUIET)$(LINKER) $(WICED_SDK_LDFLAGS) $(WICED_SDK_DCT_LINK_CMD) $(call COMPILER_SPECIFIC_LINK_MAP,$(MAP_DCT_FILE)) -o $@  $(OUTPUT_DIR)/internal_dct.o $(if $(WICED_SDK_APPLICATION_DCT),$(OUTPUT_DIR)/app_dct.o)  $(COMPILER_SPECIFIC_STDOUT_REDIRECT)
+	$(ECHO) $(LINKER) $(WICED_SDK_LDFLAGS) $(WICED_SDK_DCT_LINK_CMD) $(call COMPILER_SPECIFIC_LINK_MAP,$(MAP_DCT_FILE)) -o $@  $(OUTPUT_DIR)/internal_dct.o $(if $(WICED_SDK_APPLICATION_DCT),$(OUTPUT_DIR)/app_dct.o)  $(COMPILER_SPECIFIC_STDOUT_REDIRECT)
 	$(CP) $@ ../WICED_BIN/bin/$(nodir $@)
 	
 
 $(STRIPPED_LINK_DCT_FILE): $(LINK_DCT_FILE)
 	$(QUIET)$(STRIP) -o $@ $(STRIPFLAGS) $<
+	$(ECHO) $(STRIP) -o $@ $(STRIPFLAGS) $<
 	$(CP) $@ ../WICED_BIN/bin/$(nodir $@)
 	
 $(FINAL_DCT_FILE): $(STRIPPED_LINK_DCT_FILE)
