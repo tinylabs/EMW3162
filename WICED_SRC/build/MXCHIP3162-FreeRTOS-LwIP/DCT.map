@@ -1,0 +1,90 @@
+
+Discarded input sections
+
+ .text          0x0000000000000000        0x0 build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+ .data          0x0000000000000000        0x0 build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+ .bss           0x0000000000000000        0x0 build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+DCT1_FLASH       0x0000000008004000 0x0000000000004000 xr
+DCT2_FLASH       0x0000000008008000 0x0000000000004000 xr
+APP_FLASH        0x000000000800c000 0x00000000000f4000 xr
+SRAM             0x0000000020000000 0x0000000000020000 xrw
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+                0x0000000000000320                __STACKSIZE__ = 0x320
+
+.glue_7         0x0000000008004000        0x0
+ .glue_7        0x0000000000000000        0x0 linker stubs
+
+.glue_7t        0x0000000008004000        0x0
+ .glue_7t       0x0000000000000000        0x0 linker stubs
+
+.vfp11_veneer   0x0000000008004000        0x0
+ .vfp11_veneer  0x0000000000000000        0x0 linker stubs
+
+.v4_bx          0x0000000008004000        0x0
+ .v4_bx         0x0000000000000000        0x0 linker stubs
+
+.iplt           0x0000000008004000        0x0
+ .iplt          0x0000000000000000        0x0 build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+
+.igot.plt       0x0000000020000000        0x0
+ .igot.plt      0x0000000000000000        0x0 build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+
+.rodata         0x0000000008004000     0x1c5c
+                0x0000000008004000                dct_location = .
+ *(.rodata.initial_dct)
+ .rodata.initial_dct
+                0x0000000008004000     0x1c5c build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+ *(.rodata._app_dct)
+                0x0000000008005c5c                dct_end = .
+                0x0000000000004000                PROVIDE (dct_full_size_loc, 0x4000)
+                0x0000000000001c5c                PROVIDE (dct_used_size_loc, (dct_end - ORIGIN (DCT1_FLASH)))
+LOAD build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+LOAD /home/wouters/GIT/willemwouters/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libstdc++.a
+LOAD /home/wouters/GIT/willemwouters/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libm.a
+START GROUP
+LOAD /home/wouters/GIT/willemwouters/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libgcc.a
+LOAD /home/wouters/GIT/willemwouters/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libc.a
+END GROUP
+OUTPUT(build/MXCHIP3162-FreeRTOS-LwIP/DCT.elf elf32-littlearm)
+
+.rel.dyn        0x0000000008005c5c        0x0
+ .rel.iplt      0x0000000000000000        0x0 build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+
+.debug_info     0x0000000000000000      0xe43
+ .debug_info    0x0000000000000000      0xe43 build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+
+.debug_abbrev   0x0000000000000000      0x12a
+ .debug_abbrev  0x0000000000000000      0x12a build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+
+.debug_aranges  0x0000000000000000       0x18
+ .debug_aranges
+                0x0000000000000000       0x18 build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+
+.debug_line     0x0000000000000000       0xd7
+ .debug_line    0x0000000000000000       0xd7 build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+
+.debug_str      0x0000000000000000     0x1ea0
+ .debug_str     0x0000000000000000     0x1ea0 build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+                                       0x1f08 (size before relaxing)
+
+.comment        0x0000000000000000       0x11
+ .comment       0x0000000000000000       0x11 build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+                                         0x12 (size before relaxing)
+
+.ARM.attributes
+                0x0000000000000000       0x33
+ .ARM.attributes
+                0x0000000000000000       0x33 build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+
+Cross Reference Table
+
+Symbol                                            File
+dct_full_size_loc                                 build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o
+dct_used_size_loc                                 build/MXCHIP3162-FreeRTOS-LwIP/internal_dct.o

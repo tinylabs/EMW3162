@@ -1,0 +1,63 @@
+build/MXCHIP3162-FreeRTOS-LwIP/Modules/./WICED/platform/MCU/STM32F2xx/platform_vector_table.o: \
+ WICED/platform/MCU/STM32F2xx/platform_vector_table.c \
+ tools/ARM_GNU/bin/Linux64/../../include/stdint.h \
+ tools/ARM_GNU/bin/Linux64/../../include/_ansi.h \
+ tools/ARM_GNU/bin/Linux64/../../include/newlib.h \
+ tools/ARM_GNU/bin/Linux64/../../include/sys/config.h \
+ tools/ARM_GNU/bin/Linux64/../../include/machine/ieeefp.h \
+ tools/ARM_GNU/bin/Linux64/../../include/sys/features.h \
+ WICED/platform/MCU/STM32F2xx/platform_cmsis.h \
+ WICED/platform/MCU/STM32F2xx/peripherals/libraries/./stm32f2xx.h \
+ WICED/platform/MCU/STM32F2xx/../../ARM_CM3/CMSIS/core_cm3.h \
+ WICED/platform/MCU/STM32F2xx/../../ARM_CM3/CMSIS/core_cmInstr.h \
+ WICED/platform/MCU/STM32F2xx/../../ARM_CM3/CMSIS/core_cmFunc.h \
+ WICED/platform/MCU/STM32F2xx/peripherals/libraries/./system_stm32f2xx.h \
+ WICED/platform/MCU/STM32F2xx/peripherals/libraries/./stm32f2xx_conf.h \
+ WICED/platform/MCU/STM32F2xx/peripherals/libraries//inc/stm32f2xx_dma.h \
+ WICED/platform/MCU/STM32F2xx/peripherals/libraries//inc/stm32f2xx_exti.h \
+ WICED/platform/MCU/STM32F2xx/peripherals/libraries//inc/stm32f2xx_flash.h \
+ WICED/platform/MCU/STM32F2xx/peripherals/libraries//inc/stm32f2xx_fsmc.h \
+ WICED/platform/MCU/STM32F2xx/peripherals/libraries//inc/stm32f2xx_gpio.h \
+ WICED/platform/MCU/STM32F2xx/peripherals/libraries//inc/stm32f2xx_rcc.h \
+ WICED/platform/MCU/STM32F2xx/peripherals/libraries//inc/stm32f2xx_sdio.h \
+ WICED/platform/MCU/STM32F2xx/peripherals/libraries//inc/stm32f2xx_spi.h \
+ WICED/platform/MCU/STM32F2xx/peripherals/libraries//inc/stm32f2xx_usart.h \
+ WICED/platform/MCU/STM32F2xx/peripherals/libraries//inc/stm32f2xx_syscfg.h \
+ WICED/platform/MCU/STM32F2xx/peripherals/libraries//inc/misc.h \
+ WICED/platform/MCU/STM32F2xx/../../ARM_CM3/platform_assert.h \
+ WICED/platform/MCU/STM32F2xx/../../include/platform_constants.h \
+ WICED/platform/MCU/STM32F2xx/../../ARM_CM3/platform_isr.h \
+ WICED/platform/MCU/STM32F2xx/platform_isr_interface.h \
+ WICED/RTOS/FreeRTOS/WWD/./wwd_rtos.h \
+ WICED/RTOS/FreeRTOS/ver7.5.2/Source/include/FreeRTOS.h \
+ tools/ARM_GNU/bin/Linux64/../../lib/include/stddef.h \
+ WICED/RTOS/FreeRTOS/ver7.5.2/Source/include/projdefs.h \
+ WICED/RTOS/FreeRTOS/WWD/./ARM_CM3/FreeRTOSConfig.h \
+ platforms/MXCHIP3162/./platform_config.h \
+ WICED/RTOS/FreeRTOS/WWD/./wwd_FreeRTOS_systick.h \
+ WICED/WWD/include/wwd_assert.h WICED/WWD/include/wwd_debug.h \
+ include/wiced_defaults.h tools/ARM_GNU/bin/Linux64/../../include/stdio.h \
+ tools/ARM_GNU/bin/Linux64/../../include/_ansi.h \
+ tools/ARM_GNU/bin/Linux64/../../lib/include/stdarg.h \
+ tools/ARM_GNU/bin/Linux64/../../include/sys/reent.h \
+ tools/ARM_GNU/bin/Linux64/../../include/sys/_types.h \
+ tools/ARM_GNU/bin/Linux64/../../include/machine/_types.h \
+ tools/ARM_GNU/bin/Linux64/../../include/machine/_default_types.h \
+ tools/ARM_GNU/bin/Linux64/../../include/sys/lock.h \
+ tools/ARM_GNU/bin/Linux64/../../include/sys/types.h \
+ tools/ARM_GNU/bin/Linux64/../../include/machine/types.h \
+ tools/ARM_GNU/bin/Linux64/../../include/sys/stdio.h \
+ WICED/WWD/include/platform/wwd_bus_interface.h \
+ WICED/WWD/include/network/wwd_buffer_interface.h \
+ WICED/network/LwIP/WWD/./wwd_buffer.h WICED/WWD/include/wwd_constants.h \
+ WICED/WWD/include/wwd_wlioctl.h \
+ WICED/WWD/internal/bus_protocols/SDIO/wwd_bus_protocol.h \
+ WICED/WWD/include/platform/wwd_sdio_interface.h \
+ WICED/RTOS/FreeRTOS/ver7.5.2/Source/include/portable.h \
+ WICED/RTOS/FreeRTOS/ver7.5.2/Source/portable/GCC/ARM_CM3/portmacro.h \
+ WICED/RTOS/FreeRTOS/ver7.5.2/Source/include/mpu_wrappers.h \
+ WICED/RTOS/FreeRTOS/ver7.5.2/Source/include/semphr.h \
+ WICED/RTOS/FreeRTOS/ver7.5.2/Source/include/queue.h \
+ WICED/RTOS/FreeRTOS/ver7.5.2/Source/include/task.h \
+ WICED/RTOS/FreeRTOS/ver7.5.2/Source/include/list.h \
+ WICED/RTOS/FreeRTOS/WWD/./wwd_FreeRTOS_systick.h

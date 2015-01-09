@@ -9,6 +9,7 @@
 #
 
 default: Help
+#MAKECMDGOALS=main_app EMW3162
 
 export SOURCE_ROOT:=$(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST)))
 export MAKEFILES_PATH := $(SOURCE_ROOT)tools/makefiles
@@ -22,7 +23,7 @@ Aborting due to invalid targets
 
 Usage: make <target> [download] [run | debug] [JTAG=xxx] [no_dct]
        make run
-
+  
   <target>
     One each of the following mandatory [and optional] components separated by '-'
       * Application (apps in sub-directories are referenced by subdir.appname)
@@ -135,6 +136,7 @@ clean:
 	$(QUIET)$(ECHO) Cleaning...
 	$(QUIET)$(CLEAN_COMMAND)
 	$(QUIET)$(RM) -rf .gdbinit
+	$(QUIET)$(RM) -rf ./output
 	$(QUIET)$(ECHO) Done
 
 
@@ -182,7 +184,7 @@ $(PASSDOWN_TARGETS):
 	@:
 
 main_app: build/$(CLEANED_BUILD_STRING)/config.mk $(WICED_SDK_PRE_APP_BUILDS) $(MAKEFILES_PATH)/wiced_elf.mk $(if $(SUB_BUILD),,.gdbinit)
-	$(QUIET)$(COMMON_TOOLS_PATH)mkdir -p $(OUTPUT_DIR)/binary $(OUTPUT_DIR)/modules $(OUTPUT_DIR)/libraries $(OUTPUT_DIR)/resources
+	$(QUIET)$(COMMON_TOOLS_PATH)mkdir -p ./output ./output/lib ./output/bin $(OUTPUT_DIR)/binary $(OUTPUT_DIR)/modules $(OUTPUT_DIR)/libraries $(OUTPUT_DIR)/resources
 	$(QUIET)$(MAKE) -r $(JOBSNO) $(SILENT) -f $(MAKEFILES_PATH)/wiced_elf.mk $(DIR_BUILD_STRING) $(PASSDOWN_TARGETS)
 	$(QUIET)$(ECHO) Build complete
 

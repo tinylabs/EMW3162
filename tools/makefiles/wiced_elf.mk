@@ -39,6 +39,8 @@ OPENOCD_LOG_FILE          ?= $(OUTPUT_DIR)/openocd_log.txt
 
 LIBS_DIR                  := $(OUTPUT_DIR)/libraries
 LINK_OPTS_FILE            := $(OUTPUT_DIR)/binary/link.opts
+LINK_OPTS_LIB_FILE            := $(OUTPUT_DIR)/binary/link_lib.opts
+LINK_OPTS_OBJ_FILE            := $(OUTPUT_DIR)/binary/link_obj.opts
 
 LINT_OPTS_FILE            := $(OUTPUT_DIR)/binary/lint.opts
 
@@ -168,6 +170,8 @@ LINK_LIBS += $(WICED_SDK_PREBUILT_LIBRARIES)
 # Build rules
 ##################################
 
+QUIET=
+
 
 $(LIBS_DIR):
 	$(QUIET)$(call MKDIR, $@)
@@ -179,12 +183,40 @@ $(LIBS_DIR):
 
 # Bin file target - uses objcopy to convert the stripped elf into a binary file
 $(FINAL_OUTPUT_FILE): $(STRIPPED_LINK_OUTPUT_FILE)
-	$(QUIET)$(ECHO) Making $(notdir $@)
+ifeq (waf_bootloader,$(findstring waf_bootloader,$(FINAL_OUTPUT_FILE)))
+	$(QUIET)$(ECHO) Making1 $(FINAL_OUTPUT_FILE)
 	$(QUIET)$(OBJCOPY) -O binary -R .eh_frame -R .init -R .fini -R .comment -R .ARM.attributes $< $@
+	$(CP) $@ ./output/bin/$(nodir $@)
+else ifeq (DCT,$(findstring DCT,$(FINAL_OUTPUT_FILE)))
+	$(QUIET)$(ECHO) Making1 $(FINAL_OUTPUT_FILE)
+	$(QUIET)$(OBJCOPY) -O binary -R .eh_frame -R .init -R .fini -R .comment -R .ARM.attributes $< $@
+	$(CP) $@ ./output/bin/$(nodir $@)
+else
+
+endif
 
 # Stripped elf file target - Strips the full elf file and outputs to a new .stripped.elf file
 $(STRIPPED_LINK_OUTPUT_FILE): $(LINK_OUTPUT_FILE)
+ifeq (waf_bootloader,$(findstring waf_bootloader,$(STRIPPED_LINK_OUTPUT_FILE)))
+	$(QUIET)$(ECHO) Making $(notdir $@)
 	$(QUIET)$(STRIP) -o $@ $(STRIPFLAGS) $<
+	$(CP) $@ ./output/bin/$(nodir $@)
+else ifeq (DCT,$(findstring DCT, $(STRIPPED_LINK_OUTPUT_FILE)))
+	$(QUIET)$(ECHO) Making $(notdir $@)
+	$(QUIET)$(STRIP) -o $@ $(STRIPFLAGS) $<
+	$(CP) $@ ./output/bin/$(nodir $@)
+else
+
+endif
+
+$(LINK_OPTS_LIB_FILE):
+#$(COMPILER_SPECIFIC_LINK_MAP) $(MAP_OUTPUT_FILE) $(LINK_OPTS_FILE)
+	$(call WRITE_FILE_CREATE, $@ , $(LINK_LIBS) )
+	
+
+$(LINK_OPTS_OBJ_FILE):
+#$(COMPILER_SPECIFIC_LINK_MAP) $(MAP_OUTPUT_FILE) $(LINK_OPTS_FILE)
+	$(call WRITE_FILE_CREATE, $@ ,  $(WICED_SDK_LINK_FILES) ) )
 
 $(LINK_OPTS_FILE):
 #$(COMPILER_SPECIFIC_LINK_MAP) $(MAP_OUTPUT_FILE) $(LINK_OPTS_FILE)
@@ -203,16 +235,24 @@ LINT_DEPENDENCY := runlint
 endif
 endif
 
+
 # Linker output target - This links all component & resource libraries and objects into an output executable
 # CXX is used for compatibility with C++
-$(LINK_OUTPUT_FILE): $(LINK_LIBS) $(WICED_SDK_LINK_SCRIPT) $(LINK_OPTS_FILE) $(LINT_DEPENDENCY)
-	$(QUIET)$(ECHO) Making $(notdir $@)
+$(LINK_OUTPUT_FILE): $(LINK_LIBS) $(WICED_SDK_LINK_SCRIPT) $(LINK_OPTS_FILE) $(LINK_OPTS_LIB_FILE) $(LINK_OPTS_OBJ_FILE) $(LINT_DEPENDENCY)
+	$(ECHO) Making $(notdir $@) $(CLEANED_BUILD_STRING)
+ifneq (waf_bootloader,$(findstring waf_bootloader,$(CLEANED_BUILD_STRING)))
+	$(foreach var,$(LINK_LIBS), $(CP) $(var) ./output/lib/$(notdir $(var));)
+	$(AR) rcs ./output/startup.a $(OPTIONS_IN_FILE_OPTION)$(LINK_OPTS_OBJ_FILE)
+	$(ECHO) ================== COMPILER FLAGS FOR LIBS ======================
+	$(ECHO) $(LINKER) -o out.bin  main.c %LIBRARIES%
+	$(ECHO) =================================================================
+else
 	$(QUIET)$(LINKER) -o  $@ $(OPTIONS_IN_FILE_OPTION)$(LINK_OPTS_FILE) $(COMPILER_SPECIFIC_STDOUT_REDIRECT)
-	$(QUIET)$(ECHO_BLANK_LINE)
-	$(QUIET)$(call COMPILER_SPECIFIC_MAPFILE_TO_CSV,$(MAP_OUTPUT_FILE),$(MAP_CSV_OUTPUT_FILE))
+	$(call COMPILER_SPECIFIC_MAPFILE_TO_CSV,$(MAP_OUTPUT_FILE),$(MAP_CSV_OUTPUT_FILE))
+endif
 
 display_map_summary: $(LINK_OUTPUT_FILE)
-	$(QUIET) $(call COMPILER_SPECIFIC_MAPFILE_DISPLAY_SUMMARY,$(MAP_OUTPUT_FILE))
+#	$(QUIET) $(call COMPILER_SPECIFIC_MAPFILE_DISPLAY_SUMMARY,$(MAP_OUTPUT_FILE))
 
 
 # Device Config Table (DCT) binary file target - compiles, links, strips, and objdumps DCT source into a binary output file
