@@ -1,1 +1,0 @@
-  build/EMW3162/Modules/./WICED/platform/MCU/STM32F2xx/../../ARM_CM3/crt0_GCC.o build/EMW3162/Modules/./WICED/platform/MCU/STM32F2xx/../../ARM_CM3/hardfault_handler.o build/EMW3162/Modules/./WICED/platform/MCU/STM32F2xx/platform_vector_table.o      build/EMW3162/Modules/WICED/platform/GCC/mem_newlib.o build/EMW3162/Modules/WICED/platform/GCC/stdio_newlib.o       
