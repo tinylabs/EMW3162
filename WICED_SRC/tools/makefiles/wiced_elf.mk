@@ -214,7 +214,8 @@ $(FINAL_OUTPUT_FILE): $(STRIPPED_LINK_OUTPUT_FILE)
 ifeq (waf_bootloader,$(findstring waf_bootloader,$(FINAL_OUTPUT_FILE)))
 	$(QUIET)$(ECHO) Making1 $(FINAL_OUTPUT_FILE)
 	$(QUIET)$(OBJCOPY) -O binary -R .eh_frame -R .init -R .fini -R .comment -R .ARM.attributes $< $@
-	$(CP) $@ ../WICED_BIN/bin/$(nodir $@)
+	$(ECHO) $(OBJCOPY) -O binary -R .eh_frame -R .init -R .fini -R .comment -R .ARM.attributes $< $@
+	-$(CP) $@ ../WICED_BIN/bin/$(nodir $@)
 else
 # NORMALLY HERE IS ALSO THE MAIN BIN OUTPUT, but we only want the libraries
 endif
@@ -224,7 +225,7 @@ $(STRIPPED_LINK_OUTPUT_FILE): $(LINK_OUTPUT_FILE)
 ifeq (waf_bootloader,$(findstring waf_bootloader,$(STRIPPED_LINK_OUTPUT_FILE)))
 	$(QUIET)$(ECHO) Making $(notdir $@)
 	$(QUIET)$(STRIP) -o $@ $(STRIPFLAGS) $<
-	$(CP) $@ ../WICED_BIN/bin/$(nodir $@)
+	-$(CP) $@ ../WICED_BIN/bin/$(nodir $@)
 else
 # NORMALLY HERE IS ALSO THE MAIN BIN OUTPUT, but we only want the libraries
 endif
@@ -266,15 +267,15 @@ $(LINK_OUTPUT_FILE): $(LINK_LIBS) $(WICED_SDK_LINK_SCRIPT) $(LINK_OPTS_FILE) $(L
 ifneq (waf_bootloader,$(findstring waf_bootloader,$(CLEANED_BUILD_STRING)))
 	$(foreach var,$(LINK_LIBS), $(CP) $(var) ../WICED_BIN/lib/$(notdir $(var));)
 	$(foreach var,$(WICED_SDK_LINK_FILES), $(CP) $(var) ../WICED_BIN/lib/$(notdir $(var));)
-	/bin/ln -s `pwd`/include ../WICED_BIN/include
-	/bin/ln -s `pwd`/tools/ARM_GNU ../WICED_BIN/arm
+	-/bin/ln -s `pwd`/include ../WICED_BIN/include
+	-/bin/ln -s `pwd`/tools/ARM_GNU ../WICED_BIN/arm
 	$(CP) -r ./WICED/platform/MCU/STM32F2xx/GCC/* ../WICED_BIN/ld/
 	$(CP) -r ./WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5/* ../WICED_BIN/ld
 	$(CP) -r ./WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5/* ../WICED_BIN/ld
-
 else
 	$(QUIET)$(LINKER) -o  $@ $(OPTIONS_IN_FILE_OPTION)$(LINK_OPTS_FILE) $(COMPILER_SPECIFIC_STDOUT_REDIRECT)
 	$(call COMPILER_SPECIFIC_MAPFILE_TO_CSV,$(MAP_OUTPUT_FILE),$(MAP_CSV_OUTPUT_FILE))
+	-$(CP) $@ ../WICED_BIN/bin/$(nodir $@)
 endif
 
 display_map_summary: $(LINK_OUTPUT_FILE)
