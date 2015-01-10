@@ -1,0 +1,7 @@
+WICED 3.1 for EMW3162.
+The WICED_SRC will compile libraries and will export to WICED_BIN
+
+The projects folder holds project which compile against the WICED Libs.
+Keeps the WICED sources and own projects separated.
+
+STATUS: Fully working
