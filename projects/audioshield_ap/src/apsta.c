@@ -4,6 +4,7 @@
 #include "dns_redirect.h"
 //#include "wifi_config_dct.h"
 //#include "AudioCodec.h"
+#include "audioboard.h"
 
 static const wiced_ip_setting_t ap_ip_settings =
 {
@@ -29,9 +30,9 @@ I2C_TypeDef i2cbus;
 
 void application_start(void)
 {
-	WPRINT_PLATFORM_INFO( ("I2C initializing\n") );
+	WPRINT_PLATFORM_INFO( ("I2C running, while loop()\n") );
 
-	 //I2C_LowLevel_Init();
+	 I2C_LowLevel_Init(); // This will stop here
 
     /* Initialise the device */
     wiced_init();
