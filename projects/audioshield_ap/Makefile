@@ -1,20 +1,32 @@
-
+############# WIFI_HEADER = wifi_config_dct.h         hardcoded in dct.c
+###
+###  make                   aka all
+###  make all
+###  make download
+###  make clean
+###  make dct
+###  make app
+###
+############# OUTPUT NAMES ###########
 BINARY = bin/out.elf
 DCT_SRC=src/dct.c
 DCT_BINARY = bin/dct.elf
-
 BINARY_FINAL = bin/out.bin
 BINARY_STRIPPED = bin/out.stripped.elf
 DCT_BINARY_FINAL = bin/dct.bin
 DCT_BINARY_STRIPPED = bin/dct.stripped.elf
 
-WIFI_HEADER=wifi_config_dct.h
+############# DIR NAMES ######
 BUILDDIR=build
 SOURCEDIR=src
-SRCS=$(shell find $(SOURCEDIR) -name '*.c')
-
 BSP=./bsp
 
+############# RECOURSE FILES ######
+HTMLS=resources/index.html 
+PNGS=resources/test.png
+
+
+############# COMPILER SETTINGS #########
 ARM=$(BSP)/arm/bin/Linux64/
 CC=$(ARM)arm-none-eabi-gcc
 CP=$(ARM)arm-none-eabi-g++
@@ -22,18 +34,15 @@ AR=$(ARM)arm-none-eabi-ar
 STRIP=$(ARM)arm-none-eabi-strip	
 OBJCOPY=$(ARM)arm-none-eabi-objcopy
 
+######################## DO NOT CHANGE ####################################
 INCLUDES=-I$(SOURCEDIR) -I$(BSP)/include -I$(BSP)/include/periph  -I$(BSP)/include/WWD -I$(BSP)/include/WWD/network -I$(BSP)/include/platform -I$(BSP)/include/libraries -I$(BSP)/include/WWD/internal  -I$(BSP)/include/WWD/internal/chips -I$(BSP)/include/RTOS/FreeRTOS -I$(BSP)/include/platform/ARM_CM3 -I$(BSP)/include/RTOS/FreeRTOS/ARM_CM3 -I$(BSP)/include/MXCHIP3162 -I$(BSP)/include/network/lwip -I$(BSP)/include/network/lwip/ipv4 -I$(BSP)/include/security/BESL/include
-
 DEFINES=-DPLATFORM=\"MXCHIP3162\"
 CCFLAGS=$(DEFINES) -isystem $(ARM)/../../include -isystem $(ARM)/../../lib/include -isystem $(ARM)/../../lib/include-fixed -c  -MD -mthumb -mcpu=cortex-m3    -mlittle-endian   -Wall -fsigned-char -ffunction-sections -fdata-sections -fno-common $(INCLUDES) -DNDEBUG -ggdb -O3 
 LIBRARYLIST=./bsp/link.opts
-
 LDFLAGS=-L$(BSP)/ld/  -T$(BSP)/ld/app_with_bootloader.ld
 CCLINKFLAGS=-Wl,--gc-sections -Wl,-O3 -mthumb -mcpu=cortex-m3 -Wl,-A,thumb -mlittle-endian -nostartfiles -Wl,--defsym,__STACKSIZE__=800 $(LDFLAGS) -Wl,--start-group  bsp/lib/*.o bsp/lib/*.a 
 
-HTMLS=resources/index.html 
-PNGS=resources/test.png
-
+SRCS=$(shell find $(SOURCEDIR) -name '*.c')
 SRCS := $(SRCS:%.c=%.o)
 OBJECTS := $(addprefix $(BUILDDIR)/,$(SRCS:%.c=%.o))
 DCT_OBJECT=$(BUILDDIR)/dct/dct.o
@@ -43,6 +52,8 @@ RESOURCES_HTML_C := $(addprefix $(BUILDDIR)/resources/,$(HTMLS:%.html=%.html.c))
 RESOURCES_PNG_C += $(addprefix $(BUILDDIR)/resources/,$(PNGS:%.png=%.png.c))
 RESOURCE_A :=bsp/lib/resources.a ### DO NOT RENAME THIS, OVERWRITES THE RESOURCES NEEDED FOR BOOTLOADER
 RESOURCE_H :=bsp/include/resources.h ### DO NOT RENAME THIS, OVERWRITES THE RESOURCES NEEDED FOR BOOTLOADER
+
+
 
 all: $(BINARY_FINAL) $(DCT_BINARY_FINAL)
 dct: $(DCT_BINARY_FINAL)
@@ -93,10 +104,11 @@ $(BUILDDIR)/%.o: %.c
 	@mkdir -p $(@D)
 	$(CC) $(CCFLAGS)  -o $@ $<
 
-create_name = $(subst /,_, $(subst .,_,$(1)))
 
 
 ####### libresource.a build #########
+create_name = $(subst /,_, $(subst .,_,$(1)))
+
 $(RESOURCE_H): $(RESOURCE_A)
 	@mkdir -p $(@D)
 	rm $@
