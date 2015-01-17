@@ -27,8 +27,8 @@ PNGS=test.png
 OBJECTS := $(addprefix $(BUILDDIR)/,$(SRCS:%.c=%.o))
 RESOURCES := $(addprefix $(BUILDDIR)/resources/,$(HTMLS:%.html=%.html.o))
 RESOURCES += $(addprefix $(BUILDDIR)/resources/,$(PNGS:%.png=%.png.o))
-RESOURCES_C := $(addprefix $(BUILDDIR)/resources/,$(HTMLS:%.html=%.html.c))
-RESOURCES_C += $(addprefix $(BUILDDIR)/resources/,$(PNGS:%.png=%.png.c))
+RESOURCES_HTML_C := $(addprefix $(BUILDDIR)/resources/,$(HTMLS:%.html=%.html.c))
+RESOURCES_PNG_C += $(addprefix $(BUILDDIR)/resources/,$(PNGS:%.png=%.png.c))
 RESOURCE_A :=bsp/lib/resources.a ### DO NOT RENAME THIS, OVERWRITES THE RESOURCES NEEDED FOR BOOTLOADER
 RESOURCE_H :=bsp/include/resources.h ### DO NOT RENAME THIS, OVERWRITES THE RESOURCES NEEDED FOR BOOTLOADER
 
@@ -67,7 +67,7 @@ create_name = $(subst /,_, $(subst .,_,$(1)))
 $(RESOURCE_H): $(RESOURCE_A)
 	@mkdir -p $(@D)
 	rm $@
-	perl $(BSP)/tools/text_to_c/resources_header.pl $(RESOURCES_C) >> $@
+	perl $(BSP)/tools/text_to_c/resources_header.pl $(RESOURCES_HTML_C) $(RESOURCES_PNG_C) >> $@
 
 $(RESOURCE_A): $(RESOURCES)
 	$(AR) -rcs $@ $(RESOURCES)
@@ -76,7 +76,7 @@ $(BUILDDIR)/resources/%.png.c: %.png
 	@mkdir -p $(@D)
 	 perl $(BSP)/tools/text_to_c/bin_to_resource_c.pl MEM $(call create_name, $@) $< > $@
 	
-$(BUILDDIR)/resources/%.png.o: $(RESOURCES_C)
+$(BUILDDIR)/resources/%.png.o: $(RESOURCES_PNG_C)
 	$(CC) $(CCFLAGS) -o $@ $<
 	
 	
@@ -84,7 +84,7 @@ $(BUILDDIR)/resources/%.html.c: %.html
 	@mkdir -p $(@D)
 	 perl $(BSP)/tools/text_to_c/text_to_resource_c.pl MEM $(call create_name, $@) $< > $@
 
-$(BUILDDIR)/resources/%.html.o: $(RESOURCES_C)
+$(BUILDDIR)/resources/%.html.o: $(RESOURCES_HTML_C)
 	$(CC) $(CCFLAGS) -o $@ $<
 	
 

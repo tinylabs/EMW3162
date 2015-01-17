@@ -1,4 +1,4 @@
-build/resources/test.png.o: build/resources/index.html.c \
+build/resources/test.png.o: build/resources/test.png.c \
  bsp/include/wiced_resource.h bsp/arm/bin/Linux64//../../include/stdint.h \
  bsp/arm/bin/Linux64//../../include/_ansi.h \
  bsp/arm/bin/Linux64//../../include/newlib.h \
