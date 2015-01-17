@@ -32,17 +32,7 @@ void application_start(void)
 {
 	WPRINT_PLATFORM_INFO( ("I2C initializing\n") );
 
-	 I2C_LowLevel_Init();
-
-	//const uint8_t *data = "hallo";
-	while(1) {
-//		WPRINT_PLATFORM_INFO( ("I2C write done\n") );
-//		if(Success == I2C_Write(I2C1, data, 5, 0xa5)) {
-//			WPRINT_PLATFORM_INFO( ("I2C write success\n") );
-//		}
-	}
-
-
+	 //I2C_LowLevel_Init();
 
     /* Initialise the device */
     wiced_init();
