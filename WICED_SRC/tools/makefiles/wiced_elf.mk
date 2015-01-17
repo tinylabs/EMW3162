@@ -272,6 +272,7 @@ ifneq (waf_bootloader,$(findstring waf_bootloader,$(CLEANED_BUILD_STRING)))
 	$(CP) -r ./WICED/platform/MCU/STM32F2xx/GCC/* ../WICED_BIN/ld/
 	$(CP) -r ./WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5/* ../WICED_BIN/ld
 	$(CP) -r ./WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5/* ../WICED_BIN/ld
+	-/bin/ln -s `pwd`/tools/ ../WICED_BIN/tools
 else
 	$(QUIET)$(LINKER) -o  $@ $(OPTIONS_IN_FILE_OPTION)$(LINK_OPTS_FILE) $(COMPILER_SPECIFIC_STDOUT_REDIRECT)
 	$(call COMPILER_SPECIFIC_MAPFILE_TO_CSV,$(MAP_OUTPUT_FILE),$(MAP_CSV_OUTPUT_FILE))
