@@ -1,20 +1,27 @@
 
 BINARY = bin/out.elf
+DCT_SRC=src/dct.c
+DCT_BINARY = bin/dct.elf
+
 BINARY_FINAL = bin/out.bin
 BINARY_STRIPPED = bin/out.stripped.elf
+DCT_BINARY_FINAL = bin/dct.bin
+DCT_BINARY_STRIPPED = bin/dct.stripped.elf
 
 SRCS=apsta.c audioboard.c
+WIFI_HEADER=wifi_config_dct.h
 BUILDDIR=build
 SOURCEDIR=src
 BSP=./bsp
 
 ARM=$(BSP)/arm/bin/Linux64/
 CC=$(ARM)arm-none-eabi-gcc
+CP=$(ARM)arm-none-eabi-g++
 AR=$(ARM)arm-none-eabi-ar
 STRIP=$(ARM)arm-none-eabi-strip	
 OBJCOPY=$(ARM)arm-none-eabi-objcopy
 
-INCLUDES=-I$(BSP)/include -I$(BSP)/include/periph  -I$(BSP)/include/WWD -I$(BSP)/include/WWD/network -I$(BSP)/include/platform -I$(BSP)/include/libraries -I$(BSP)/include/WWD/internal  -I$(BSP)/include/WWD/internal/chips -I$(BSP)/include/RTOS/FreeRTOS -I$(BSP)/include/platform/ARM_CM3 -I$(BSP)/include/RTOS/FreeRTOS/ARM_CM3 -I$(BSP)/include/MXCHIP3162 -I$(BSP)/include/network/lwip -I$(BSP)/include/network/lwip/ipv4 -I$(BSP)/include/security/BESL/include
+INCLUDES=-I$(SOURCEDIR) -I$(BSP)/include -I$(BSP)/include/periph  -I$(BSP)/include/WWD -I$(BSP)/include/WWD/network -I$(BSP)/include/platform -I$(BSP)/include/libraries -I$(BSP)/include/WWD/internal  -I$(BSP)/include/WWD/internal/chips -I$(BSP)/include/RTOS/FreeRTOS -I$(BSP)/include/platform/ARM_CM3 -I$(BSP)/include/RTOS/FreeRTOS/ARM_CM3 -I$(BSP)/include/MXCHIP3162 -I$(BSP)/include/network/lwip -I$(BSP)/include/network/lwip/ipv4 -I$(BSP)/include/security/BESL/include
 
 DEFINES=-DPLATFORM=\"MXCHIP3162\"
 CCFLAGS=$(DEFINES) -isystem $(ARM)/../../include -isystem $(ARM)/../../lib/include -isystem $(ARM)/../../lib/include-fixed -c  -MD -mthumb -mcpu=cortex-m3    -mlittle-endian   -Wall -fsigned-char -ffunction-sections -fdata-sections -fno-common $(INCLUDES) -DNDEBUG -ggdb -O3 
@@ -27,6 +34,7 @@ HTMLS=resources/index.html
 PNGS=resources/test.png
 SRCS := $(addprefix $(SOURCEDIR)/,$(SRCS:%.c=%.o))
 OBJECTS := $(addprefix $(BUILDDIR)/,$(SRCS:%.c=%.o))
+DCT_OBJECT=$(BUILDDIR)/dct/dct.o
 RESOURCES := $(addprefix $(BUILDDIR)/resources/,$(HTMLS:%.html=%.html.o))
 RESOURCES += $(addprefix $(BUILDDIR)/resources/,$(PNGS:%.png=%.png.o))
 RESOURCES_HTML_C := $(addprefix $(BUILDDIR)/resources/,$(HTMLS:%.html=%.html.c))
@@ -34,15 +42,36 @@ RESOURCES_PNG_C += $(addprefix $(BUILDDIR)/resources/,$(PNGS:%.png=%.png.c))
 RESOURCE_A :=bsp/lib/resources.a ### DO NOT RENAME THIS, OVERWRITES THE RESOURCES NEEDED FOR BOOTLOADER
 RESOURCE_H :=bsp/include/resources.h ### DO NOT RENAME THIS, OVERWRITES THE RESOURCES NEEDED FOR BOOTLOADER
 
-all: $(BINARY_FINAL)
+all: $(BINARY_FINAL) $(DCT_BINARY_FINAL)
+dct: $(DCT_BINARY_FINAL)
+app: $(BINARY_FINAL)
+
 
 clean:
 	rm -rf ./bin
 	rm -rf ./build
 	
-$(BINARY_FINAL): $(BINARY_STRIPPED)
+
+############## DCT BUILD ####################
+$(DCT_BINARY_FINAL): $(DCT_BINARY_STRIPPED)
 	$(OBJCOPY) -O binary -R .eh_frame -R .init -R .fini -R .comment -R .ARM.attributes $< $@
 
+
+$(DCT_BINARY_STRIPPED): $(DCT_BINARY)
+	$(STRIP) -o $@ $(STRIPFLAGS) $<
+
+$(DCT_BINARY): $(DCT_OBJECT) 
+	$(CP)  --static -Wl,-static -Wl,--warn-common -Wl,--gc-sections -Wl,-O3 -Wl,--cref  -mthumb -mcpu=cortex-m3 -Wl,-A,thumb -mlittle-endian -nostartfiles -Wl,--defsym,__STACKSIZE__=800 -L ../../WICED_SRC/WICED/platform/MCU/STM32F2xx/GCC -L ../../WICED_SRC/WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5 -Wl,-T ../../WICED_SRC/WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5/dct.ld -Wl,-Map,DCT.map -o $(DCT_BINARY) $(DCT_OBJECT)
+	
+$(BUILDDIR)/dct/%.o: $(DCT_SRC)
+	@mkdir -p $(@D)
+	$(CC) -DBOOTLOADER_MAGIC_NUMBER=0x4d435242 $(CCFLAGS) -DWIFI_CONFIG_APPLICATION_DEFINED -DWIFI_CONFIG_DCT_H="$(WIFI_HEADER)"-DDEBUG -ggdb -O0 -Wall -fsigned-char -ffunction-sections -fdata-sections -fno-common -o $@ $<
+
+
+
+####### Normal .c build #########
+$(BINARY_FINAL): $(BINARY_STRIPPED) 
+	$(OBJCOPY) -O binary -R .eh_frame -R .init -R .fini -R .comment -R .ARM.attributes $< $@
 
 $(BINARY_STRIPPED): $(BINARY)
 	$(STRIP) -o $@ $(STRIPFLAGS) $<
@@ -58,12 +87,12 @@ $(BINARY): $(RESOURCE_H) $(OBJECTS)
 	cp $(BSP)/bin/DCT.bin ./bin/DCT.bin
 
 
-####### Normal .c build #########
 $(BUILDDIR)/%.o: %.c
 	@mkdir -p $(@D)
 	$(CC) $(CCFLAGS)  -o $@ $<
 
 create_name = $(subst /,_, $(subst .,_,$(1)))
+
 
 ####### libresource.a build #########
 $(RESOURCE_H): $(RESOURCE_A)
@@ -90,11 +119,11 @@ $(BUILDDIR)/resources/%.html.o: $(RESOURCES_HTML_C)
 	$(CC) $(CCFLAGS) -o $@ $<
 	
 
-
+######### flash utils ##############3
 download: $(BINARY_FINAL)
 	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/bootloader.stripped.elf"  -c shutdown
 	sleep 1
-	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/DCT.stripped.elf" -c shutdown
+	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/dct.stripped.elf" -c shutdown
 	sleep 1
 	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.stripped.elf" -c shutdown
 
@@ -102,6 +131,6 @@ download: $(BINARY_FINAL)
 download_bin: $(BINARY_FINAL)
 	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/bootloader.bin 0x8000000"  -c shutdown
 	sleep 1
-	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/DCT.bin 0x8004000" -c shutdown
+	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/dct.bin 0x8004000" -c shutdown
 	sleep 1
 	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.bin 0x8008000" -c shutdown
