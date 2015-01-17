@@ -5,6 +5,7 @@ BINARY_STRIPPED = bin/out.stripped.elf
 
 SRCS=apsta.c audioboard.c
 BUILDDIR=build
+SOURCEDIR=src
 BSP=./bsp
 
 ARM=$(BSP)/arm/bin/Linux64/
@@ -22,8 +23,9 @@ LIBRARYLIST=./bsp/link.opts
 LDFLAGS=-L$(BSP)/ld/  -T$(BSP)/ld/app_with_bootloader.ld
 CCLINKFLAGS=-Wl,--gc-sections -Wl,-O3 -mthumb -mcpu=cortex-m3 -Wl,-A,thumb -mlittle-endian -nostartfiles -Wl,--defsym,__STACKSIZE__=800 $(LDFLAGS) -Wl,--start-group  bsp/lib/*.o bsp/lib/*.a 
 
-HTMLS=index.html 
-PNGS=test.png
+HTMLS=resources/index.html 
+PNGS=resources/test.png
+SRCS := $(addprefix $(SOURCEDIR)/,$(SRCS:%.c=%.o))
 OBJECTS := $(addprefix $(BUILDDIR)/,$(SRCS:%.c=%.o))
 RESOURCES := $(addprefix $(BUILDDIR)/resources/,$(HTMLS:%.html=%.html.o))
 RESOURCES += $(addprefix $(BUILDDIR)/resources/,$(PNGS:%.png=%.png.o))

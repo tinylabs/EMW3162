@@ -1,5 +1,6 @@
-build/resources/test.png.o: build/resources/test.png.c \
- bsp/include/wiced_resource.h bsp/arm/bin/Linux64//../../include/stdint.h \
+build/resources/resources/index.html.o: \
+ build/resources/resources/index.html.c bsp/include/wiced_resource.h \
+ bsp/arm/bin/Linux64//../../include/stdint.h \
  bsp/arm/bin/Linux64//../../include/_ansi.h \
  bsp/arm/bin/Linux64//../../include/newlib.h \
  bsp/arm/bin/Linux64//../../include/sys/config.h \
