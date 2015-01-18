@@ -267,14 +267,14 @@ $(LINK_OUTPUT_FILE): $(LINK_LIBS) $(WICED_SDK_LINK_SCRIPT) $(LINK_OPTS_FILE) $(L
 ifneq (waf_bootloader,$(findstring waf_bootloader,$(CLEANED_BUILD_STRING)))
 	$(foreach var,$(LINK_LIBS), $(CP) $(var) ../WICED_BIN/lib/$(notdir $(var));)
 	$(foreach var,$(WICED_SDK_LINK_FILES), $(CP) $(var) ../WICED_BIN/lib/$(notdir $(var));)
-	-/bin/ln -s `pwd`/include ../WICED_BIN/include
-	-/bin/ln -s `pwd`/WICED/security ../WICED_BIN/include_security
-	-/bin/ln -s `pwd`/platform/include ../WICED_BIN/include/platform
-	-/bin/ln -s `pwd`/tools/ARM_GNU ../WICED_BIN/arm
+	-/bin/ln -s ../WICED_SRC/include ../WICED_BIN/include
+	-/bin/ln -s ../WICED_SRC//WICED/security ../WICED_BIN/include_security
+	-/bin/ln -s ../WICED_SRC//platform/include ../WICED_BIN/include/platform
+	-/bin/ln -s ../WICED_SRC/tools/ARM_GNU ../WICED_BIN/arm
 	$(CP) -r ./WICED/platform/MCU/STM32F2xx/GCC/* ../WICED_BIN/ld/
 	$(CP) -r ./WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5/* ../WICED_BIN/ld
 	$(CP) -r ./WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5/* ../WICED_BIN/ld
-	-/bin/ln -s `pwd`/tools/ ../WICED_BIN/tools
+	-/bin/ln -s ../WICED_SRC/tools/ ../WICED_BIN/tools
 else
 	$(QUIET)$(LINKER) -o  $@ $(OPTIONS_IN_FILE_OPTION)$(LINK_OPTS_FILE) $(COMPILER_SPECIFIC_STDOUT_REDIRECT)
 	$(call COMPILER_SPECIFIC_MAPFILE_TO_CSV,$(MAP_OUTPUT_FILE),$(MAP_CSV_OUTPUT_FILE))
@@ -288,20 +288,15 @@ display_map_summary: $(LINK_OUTPUT_FILE)
 # Device Config Table (DCT) binary file target - compiles, links, strips, and objdumps DCT source into a binary output file
 $(LINK_DCT_FILE): $(OUTPUT_DIR)/generated_security_dct.h $(WICED_SDK_DCT_LINK_SCRIPT) $(SOURCE_ROOT)WICED/internal/dct.c $(WICED_SDK_APPLICATION_DCT) $(WICED_SDK_WIFI_CONFIG_DCT_H) $(CONFIG_FILE) | $(PLATFORM_PRE_BUILD_TARGETS)
 	$(QUIET)$(ECHO) Making DCT image
-	$(ECHO) $(CC) $(CPU_CFLAGS) $(COMPILER_SPECIFIC_COMP_ONLY_FLAG)  $(SOURCE_ROOT)WICED/internal/dct.c $(WICED_SDK_DEFINES) $(WICED_SDK_INCLUDES) $(COMPILER_SPECIFIC_DEBUG_CFLAGS)  $(call ADD_COMPILER_SPECIFIC_STANDARD_CFLAGS, ) -I$(OUTPUT_DIR) -I$(SOURCE_ROOT). -o $(OUTPUT_DIR)/internal_dct.o $(COMPILER_SPECIFIC_STDOUT_REDIRECT)
 	$(QUIET)$(CC) $(CPU_CFLAGS) $(COMPILER_SPECIFIC_COMP_ONLY_FLAG)  $(SOURCE_ROOT)WICED/internal/dct.c $(WICED_SDK_DEFINES) $(WICED_SDK_INCLUDES) $(COMPILER_SPECIFIC_DEBUG_CFLAGS)  $(call ADD_COMPILER_SPECIFIC_STANDARD_CFLAGS, ) -I$(OUTPUT_DIR) -I$(SOURCE_ROOT). -o $(OUTPUT_DIR)/internal_dct.o $(COMPILER_SPECIFIC_STDOUT_REDIRECT)
-	$(if $(WICED_SDK_APPLICATION_DCT),$(ECHO) $(CC) $(CPU_CFLAGS) $(COMPILER_SPECIFIC_COMP_ONLY_FLAG)  $(WICED_SDK_APPLICATION_DCT) $(WICED_SDK_DEFINES) $(WICED_SDK_INCLUDES) $(COMPILER_SPECIFIC_DEBUG_CFLAGS)  $(call ADD_COMPILER_SPECIFIC_STANDARD_CFLAGS, ) -I$(OUTPUT_DIR) -I$(SOURCE_ROOT). -o $(OUTPUT_DIR)/app_dct.o)
 	$(if $(WICED_SDK_APPLICATION_DCT),$(QUIET)$(CC) $(CPU_CFLAGS) $(COMPILER_SPECIFIC_COMP_ONLY_FLAG)  $(WICED_SDK_APPLICATION_DCT) $(WICED_SDK_DEFINES) $(WICED_SDK_INCLUDES) $(COMPILER_SPECIFIC_DEBUG_CFLAGS)  $(call ADD_COMPILER_SPECIFIC_STANDARD_CFLAGS, ) -I$(OUTPUT_DIR) -I$(SOURCE_ROOT). -o $(OUTPUT_DIR)/app_dct.o)
-	$(ECHO) $(LINKER) $(WICED_SDK_LDFLAGS) $(WICED_SDK_DCT_LINK_CMD) $(call COMPILER_SPECIFIC_LINK_MAP,$(MAP_DCT_FILE)) -o $@  $(OUTPUT_DIR)/internal_dct.o $(if $(WICED_SDK_APPLICATION_DCT),$(OUTPUT_DIR)/app_dct.o)  $(COMPILER_SPECIFIC_STDOUT_REDIRECT)
 	$(QUIET)$(LINKER) $(WICED_SDK_LDFLAGS) $(WICED_SDK_DCT_LINK_CMD) $(call COMPILER_SPECIFIC_LINK_MAP,$(MAP_DCT_FILE)) -o $@  $(OUTPUT_DIR)/internal_dct.o $(if $(WICED_SDK_APPLICATION_DCT),$(OUTPUT_DIR)/app_dct.o)  $(COMPILER_SPECIFIC_STDOUT_REDIRECT)
 	
 
 $(STRIPPED_LINK_DCT_FILE): $(LINK_DCT_FILE)
-	$(ECHO) $(STRIP) -o $@ $(STRIPFLAGS) $<
 	$(QUIET)$(STRIP) -o $@ $(STRIPFLAGS) $<
 
 $(FINAL_DCT_FILE): $(STRIPPED_LINK_DCT_FILE)
-	$(ECHO) $(OBJCOPY) -O binary -R .eh_frame -R .init -R .fini -R .comment -R .ARM.attributes $< $@
 	$(QUIET)$(OBJCOPY) -O binary -R .eh_frame -R .init -R .fini -R .comment -R .ARM.attributes $< $@
 
 # Certificates header target - Converts and concatenates text certificate files into a header file

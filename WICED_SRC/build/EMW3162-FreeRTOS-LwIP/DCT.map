@@ -46,11 +46,11 @@ Linker script and memory map
                 0x0000000000004000                PROVIDE (dct_full_size_loc, 0x4000)
                 0x0000000000001c5c                PROVIDE (dct_used_size_loc, (dct_end - ORIGIN (DCT1_FLASH)))
 LOAD build/EMW3162-FreeRTOS-LwIP/internal_dct.o
-LOAD /home/wouters/test/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libstdc++.a
-LOAD /home/wouters/test/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libm.a
+LOAD /home/wouters/GIT/willemwouters/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libstdc++.a
+LOAD /home/wouters/GIT/willemwouters/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libm.a
 START GROUP
-LOAD /home/wouters/test/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libgcc.a
-LOAD /home/wouters/test/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libc.a
+LOAD /home/wouters/GIT/willemwouters/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libgcc.a
+LOAD /home/wouters/GIT/willemwouters/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libc.a
 END GROUP
 OUTPUT(build/EMW3162-FreeRTOS-LwIP/DCT.elf elf32-littlearm)
 
@@ -70,9 +70,9 @@ OUTPUT(build/EMW3162-FreeRTOS-LwIP/DCT.elf elf32-littlearm)
 .debug_line     0x0000000000000000       0xd7
  .debug_line    0x0000000000000000       0xd7 build/EMW3162-FreeRTOS-LwIP/internal_dct.o
 
-.debug_str      0x0000000000000000     0x1e93
- .debug_str     0x0000000000000000     0x1e93 build/EMW3162-FreeRTOS-LwIP/internal_dct.o
-                                       0x1efb (size before relaxing)
+.debug_str      0x0000000000000000     0x1ea0
+ .debug_str     0x0000000000000000     0x1ea0 build/EMW3162-FreeRTOS-LwIP/internal_dct.o
+                                       0x1f08 (size before relaxing)
 
 .comment        0x0000000000000000       0x11
  .comment       0x0000000000000000       0x11 build/EMW3162-FreeRTOS-LwIP/internal_dct.o
