@@ -12,7 +12,7 @@
 #include <stm32f2xx_gpio.h>
 #include "audioboard.h"
 
-#define ADDR 0x1a // i2c address and write bit
+#define ADDR 0x34 // i2c address and write bit
 #define SDA_PIN GPIO_Pin_7 // i2c data line
 #define SCL_PIN GPIO_Pin_6 // i2c clock line
 #define LED_PIN 13 // board led pin
@@ -30,11 +30,13 @@ int digitalRead(int pin) {
 }
 // us delay timer (~1us per unit)
 // sets the i2c clock rate
+
 void mydelay(long t) {
 	long i = 0;
 
-	int max = t / 10;
-	for(i = 0; i < (70 * max * 2); i++) {
+
+
+	for(i = 0; i < (7 * t); i++) {
 		__asm("nop");
 	}
 }
@@ -64,7 +66,7 @@ void i2cbb_stop(void) {
   digitalWrite(SCL_PIN, HIGH); // release clock line
   mydelay(10); // delay
   digitalWrite(SDA_PIN, HIGH); // release data line
-  mydelay(40); // delay to make sure a new data transfer doesnt occur too quickly
+  mydelay(400); // delay to make sure a new data transfer doesnt occur too quickly
 }
 
 
@@ -80,14 +82,15 @@ char i2cbb_send(unsigned char data) {  // clock out data
     digitalWrite(SCL_PIN, LOW);
   }
   // check for ack
-  digitalWrite(SDA_PIN, HIGH); // release line
+  digitalWrite(SDA_PIN, LOW); // release line
 
-  mydelay(10); // wait a bit
- // clock the ack or nack
+  mydelay(9); // wait a bit
+// // clock the ack or nack
   digitalWrite(SCL_PIN, HIGH);
-  mydelay(10);
+  mydelay(9);
   digitalWrite(SCL_PIN, LOW);
   // make sure line is released
+  mydelay(15);
 
   if (state > 1) { // send stop if failure
     i2cbb_stop();
@@ -213,7 +216,7 @@ void I2C_LowLevel_Init()
 	   gpioStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
 	   gpioStructure.GPIO_Mode = GPIO_Mode_OUT;
 	   gpioStructure.GPIO_PuPd = GPIO_PuPd_UP;
-	   gpioStructure.GPIO_OType = GPIO_OType_OD;
+	   gpioStructure.GPIO_OType = GPIO_OType_PP;
 	   gpioStructure.GPIO_Speed = GPIO_Speed_25MHz;
 	   GPIO_DeInit(GPIOB);
 	   GPIO_Init(GPIOB, &gpioStructure);
@@ -223,13 +226,10 @@ void I2C_LowLevel_Init()
 
 	   digitalWrite(SCL_PIN, HIGH); // release clock line
 	   digitalWrite(SDA_PIN, HIGH); // release data line
-   	   mydelay(50000);
+   	   mydelay(500);
 
 	  // digitalWrite(SCL_PIN, HIGH);
-	   while(1) {
+   	   codec_maple_reg_setup();
+	   GPIO_DeInit(GPIOB);
 
-		   codec_maple_reg_setup();
-	   	   mydelay(5000);
-
-	   }
 }

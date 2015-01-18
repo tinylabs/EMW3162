@@ -1,1 +1,1 @@
-make EMW3162-FreeRTOS-LwIP
+./make EMW3162-FreeRTOS-LwIP
