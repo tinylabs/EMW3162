@@ -36,7 +36,7 @@ build/waf_bootloader-NoOS-NoNS-EMW3162-SDIO/Modules/apps/waf/bootloader/bootload
  WICED/network/NoNS/WWD/./wwd_buffer.h WICED/WWD/include/wwd_constants.h \
  apps/waf/bootloader/elf.h include/wiced_framework.h \
  include/wiced_result.h include/wiced_resource.h \
- include/security/BESL/include/besl_structures.h \
+ WICED/./security/BESL/include/besl_structures.h \
  include/wiced_constants.h \
  include/../libraries/bluetooth/include/wiced_bt_constants.h \
  include/wiced_utilities.h \

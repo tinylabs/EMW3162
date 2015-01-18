@@ -76,7 +76,7 @@ build/EMW3162-FreeRTOS-LwIP/Modules/./WICED/network/LwIP/WICED/wiced_ping.o: \
  WICED/network/LwIP/ver1.4.0.rc1/src/include/ipv4/lwip/autoip.h \
  WICED/network/LwIP/ver1.4.0.rc1/src/include/lwip/timers.h \
  include/wiced.h include/wiced_utilities.h include/wiced_result.h \
- include/wiced_resource.h include/security/BESL/include/besl_structures.h \
+ include/wiced_resource.h WICED/./security/BESL/include/besl_structures.h \
  WICED/platform/MCU/STM32F2xx/../../include/platform_constants.h \
  include/wiced_constants.h \
  include/../libraries/bluetooth/include/wiced_bt_constants.h \

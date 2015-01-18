@@ -47,7 +47,7 @@ build/EMW3162-FreeRTOS-LwIP/Modules/./WICED/RTOS/FreeRTOS/WICED/wiced_rtos.o: \
  WICED/RTOS/FreeRTOS/ver7.5.2/Source/include/timers.h \
  WICED/RTOS/FreeRTOS/ver7.5.2/Source/include/task.h \
  include/wiced_result.h include/wiced_resource.h \
- include/security/BESL/include/besl_structures.h \
+ WICED/./security/BESL/include/besl_structures.h \
  WICED/platform/MCU/STM32F2xx/../../include/platform_constants.h \
  include/wiced_constants.h \
  include/../libraries/bluetooth/include/wiced_bt_constants.h \

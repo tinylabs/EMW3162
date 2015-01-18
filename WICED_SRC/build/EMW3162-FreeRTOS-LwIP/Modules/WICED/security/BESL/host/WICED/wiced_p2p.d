@@ -9,7 +9,7 @@ build/EMW3162-FreeRTOS-LwIP/Modules/./WICED/security/BESL/host/WICED/wiced_p2p.o
  tools/ARM_GNU/bin/Linux64/../../include/machine/ieeefp.h \
  tools/ARM_GNU/bin/Linux64/../../include/sys/features.h \
  WICED/WWD/include/wwd_wlioctl.h include/wiced_resource.h \
- include/security/BESL/include/besl_structures.h \
+ WICED/./security/BESL/include/besl_structures.h \
  WICED/platform/MCU/STM32F2xx/../../include/platform_constants.h \
  include/wiced_constants.h \
  include/../libraries/bluetooth/include/wiced_bt_constants.h \

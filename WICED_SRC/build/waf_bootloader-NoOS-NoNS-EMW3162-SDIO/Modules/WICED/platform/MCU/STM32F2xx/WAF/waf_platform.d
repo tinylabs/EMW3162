@@ -53,7 +53,7 @@ build/waf_bootloader-NoOS-NoNS-EMW3162-SDIO/Modules/./WICED/platform/MCU/STM32F2
  WICED/platform/MCU/STM32F2xx/../../ARM_CM3/platform_isr.h \
  WICED/WWD/include/wwd_structures.h WICED/WWD/include/wwd_constants.h \
  libraries/utilities/ring_buffer/./ring_buffer.h include/wiced_result.h \
- include/wiced_resource.h include/security/BESL/include/besl_structures.h \
+ include/wiced_resource.h WICED/./security/BESL/include/besl_structures.h \
  include/wiced_constants.h \
  include/../libraries/bluetooth/include/wiced_bt_constants.h \
  WICED/WWD/include/wwd_assert.h WICED/WWD/include/wwd_debug.h \

@@ -76,9 +76,9 @@ FLASH,Host MCU-family library, text.TIM_Cmd, 28, 0x0000000008001d64, 134225252, 
 FLASH,Host MCU-family library, text.TIM_ITConfig, 20, 0x0000000008001d80, 134225280, build/waf_bootloader-NoOS-NoNS-EMW3162-SDIO/libraries/STM32F2xx_Peripheral_Libraries.a(stm32f2xx_tim.o)
 FLASH,Host MCU-family library, text.TIM_ClearITPendingBit, 8, 0x0000000008001d94, 134225300, build/waf_bootloader-NoOS-NoNS-EMW3162-SDIO/libraries/STM32F2xx_Peripheral_Libraries.a(stm32f2xx_tim.o)
 FLASH,WWD, text.host_rtos_set_semaphore, 16, 0x0000000008001d9c, 134225308, build/waf_bootloader-NoOS-NoNS-EMW3162-SDIO/libraries/WWD_NoOS_Interface.a(wwd_rtos.o)
-FLASH,libc, text.memcmp, 100, 0x0000000008001dac, 134225324, /home/wouters/GIT/willemwouters/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libc.a(lib_a-memcmp.o)
-FLASH,libc, text.memcpy, 288, 0x0000000008001e10, 134225424, /home/wouters/GIT/willemwouters/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libc.a(lib_a-memcpy-stub.o)
-FLASH,libc, text.memset, 160, 0x0000000008001f30, 134225712, /home/wouters/GIT/willemwouters/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libc.a(lib_a-memset.o)
+FLASH,libc, text.memcmp, 100, 0x0000000008001dac, 134225324, /home/wouters/test/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libc.a(lib_a-memcmp.o)
+FLASH,libc, text.memcpy, 288, 0x0000000008001e10, 134225424, /home/wouters/test/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libc.a(lib_a-memcpy-stub.o)
+FLASH,libc, text.memset, 160, 0x0000000008001f30, 134225712, /home/wouters/test/EMW3162_WICED/WICED_SRC/tools/ARM_GNU/bin/Linux64/../../lib/thumb/v7m/libc.a(lib_a-memset.o)
 FLASH,Other, rodata.DCT_section_offsets, 20, 0x0000000008001fd0, 134225872, build/waf_bootloader-NoOS-NoNS-EMW3162-SDIO/Modules/./WICED/platform/MCU/STM32F2xx/WAF/waf_platform.o
 FLASH,platform, rodata.platform_gpio_pins, 136, 0x0000000008001fe4, 134225892, build/waf_bootloader-NoOS-NoNS-EMW3162-SDIO/libraries/Platform_EMW3162.a(platform.o)
 FLASH,Host MCU-family library, rodata.gpio_peripheral_clocks, 32, 0x000000000800206c, 134226028, build/waf_bootloader-NoOS-NoNS-EMW3162-SDIO/libraries/STM32F2xx_Peripheral_Drivers.a(platform_gpio.o)

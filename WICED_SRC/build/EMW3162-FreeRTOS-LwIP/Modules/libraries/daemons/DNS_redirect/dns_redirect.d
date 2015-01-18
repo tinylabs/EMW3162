@@ -18,7 +18,7 @@ build/EMW3162-FreeRTOS-LwIP/Modules/libraries/daemons/DNS_redirect/dns_redirect.
  tools/ARM_GNU/bin/Linux64/../../include/stdint.h include/wiced.h \
  include/wiced_utilities.h include/wiced_result.h \
  WICED/WWD/include/wwd_constants.h WICED/WWD/include/wwd_wlioctl.h \
- include/wiced_resource.h include/security/BESL/include/besl_structures.h \
+ include/wiced_resource.h WICED/./security/BESL/include/besl_structures.h \
  WICED/platform/MCU/STM32F2xx/../../include/platform_constants.h \
  include/wiced_constants.h \
  include/../libraries/bluetooth/include/wiced_bt_constants.h \
