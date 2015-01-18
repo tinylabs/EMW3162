@@ -161,7 +161,7 @@ endef
 # Create targets for resource files
 # Create targets for resource files
 
-ALL_RESOURCES  := ./resources/apps/apsta/ap_top.html \
+ALL_RESOURCES  := \
                       ./resources/images/brcmlogo.png \
                       ./resources/images/brcmlogo_line.png \
                       ./resources/images/favicon.ico \
@@ -212,9 +212,8 @@ $(LIBS_DIR):
 # Bin file target - uses objcopy to convert the stripped elf into a binary file
 $(FINAL_OUTPUT_FILE): $(STRIPPED_LINK_OUTPUT_FILE)
 ifeq (waf_bootloader,$(findstring waf_bootloader,$(FINAL_OUTPUT_FILE)))
-	$(QUIET)$(ECHO) Making1 $(FINAL_OUTPUT_FILE)
+	$(QUIET)$(ECHO) Making $(FINAL_OUTPUT_FILE)
 	$(QUIET)$(OBJCOPY) -O binary -R .eh_frame -R .init -R .fini -R .comment -R .ARM.attributes $< $@
-	$(ECHO) $(OBJCOPY) -O binary -R .eh_frame -R .init -R .fini -R .comment -R .ARM.attributes $< $@
 	-$(CP) $@ ../WICED_BIN/bin/$(nodir $@)
 else
 # NORMALLY HERE IS ALSO THE MAIN BIN OUTPUT, but we only want the libraries
@@ -263,19 +262,20 @@ endif
 # Linker output target - This links all component & resource libraries and objects into an output executable
 # CXX is used for compatibility with C++
 $(LINK_OUTPUT_FILE): $(LINK_LIBS) $(WICED_SDK_LINK_SCRIPT) $(LINK_OPTS_FILE) $(LINK_OPTS_LIB_FILE) $(LINK_OPTS_OBJ_FILE) $(LINT_DEPENDENCY)
-	$(ECHO) Making $(notdir $@) $(CLEANED_BUILD_STRING)
+	
 ifneq (waf_bootloader,$(findstring waf_bootloader,$(CLEANED_BUILD_STRING)))
+	$(ECHO) Exporting libraries to create $(notdir $@)
 	$(foreach var,$(LINK_LIBS), $(CP) $(var) ../WICED_BIN/lib/$(notdir $(var));)
 	$(foreach var,$(WICED_SDK_LINK_FILES), $(CP) $(var) ../WICED_BIN/lib/$(notdir $(var));)
-	-/bin/ln -s ../WICED_SRC/include ../WICED_BIN/include
-	-/bin/ln -s ../WICED_SRC//WICED/security ../WICED_BIN/include_security
-	-/bin/ln -s ../WICED_SRC//platform/include ../WICED_BIN/include/platform
-	-/bin/ln -s ../WICED_SRC/tools/ARM_GNU ../WICED_BIN/arm
+	-/bin/ln -sf ../WICED_SRC/include ../WICED_BIN/include
+	-/bin/ln -sf ../WICED_SRC//WICED/security ../WICED_BIN/include_security
+	-/bin/ln -sf ../WICED_SRC/tools/ARM_GNU ../WICED_BIN/arm
+	-/bin/ln -sf ../WICED_SRC/tools/ ../WICED_BIN/tools
 	$(CP) -r ./WICED/platform/MCU/STM32F2xx/GCC/* ../WICED_BIN/ld/
 	$(CP) -r ./WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5/* ../WICED_BIN/ld
 	$(CP) -r ./WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5/* ../WICED_BIN/ld
-	-/bin/ln -s ../WICED_SRC/tools/ ../WICED_BIN/tools
 else
+	$(ECHO) Making $(notdir $@)
 	$(QUIET)$(LINKER) -o  $@ $(OPTIONS_IN_FILE_OPTION)$(LINK_OPTS_FILE) $(COMPILER_SPECIFIC_STDOUT_REDIRECT)
 	$(call COMPILER_SPECIFIC_MAPFILE_TO_CSV,$(MAP_OUTPUT_FILE),$(MAP_CSV_OUTPUT_FILE))
 	-$(CP) $@ ../WICED_BIN/bin/$(nodir $@)
