@@ -17,8 +17,8 @@ static wiced_http_server_t ap_http_server;
 
 START_OF_HTTP_PAGE_DATABASE(ap_web_pages)
     ROOT_HTTP_PAGE_REDIRECT("/index.html"),
-    { "/index.html",         "text/html",                         WICED_RESOURCE_URL_CONTENT,   .url_content.resource_data  = &build_resources_resources_index_html_c,    },
-    { "/test.png",       "image/png",                         WICED_RESOURCE_URL_CONTENT,   .url_content.resource_data  = &build_resources_resources_test_png_c,      },
+    { "/index.html", "text/html", WICED_RESOURCE_URL_CONTENT,   .url_content.resource_data  = &build_resources_index_html_c,    },
+    { "/test.png",   "image/png", WICED_RESOURCE_URL_CONTENT,   .url_content.resource_data  = &build_resources_test_png_c,      },
 END_OF_HTTP_PAGE_DATABASE();
 
 static dns_redirector_t    dns_redirector;
