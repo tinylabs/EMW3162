@@ -11,7 +11,8 @@
 #include <stm32f2xx_rcc.h>
 #include <stm32f2xx_gpio.h>
 #include "audioboard.h"
-
+#include "spi.h"
+#include "wiced_platform.h"
 #define ADDR 0x34 // i2c address and write bit
 #define SDA_PIN GPIO_Pin_7 // i2c data line
 #define SCL_PIN GPIO_Pin_6 // i2c clock line
@@ -174,42 +175,87 @@ void codec_maple_reg_setup(void) {
 
 }
 
+// TODO Move this
+int generic_sflash_command(                                      const sflash_handle_t* const handle,
+                                                                 sflash_command_t             cmd,
+                                                                 unsigned long                num_initial_parameter_bytes,
+                            /*@null@*/ /*@observer@*/            const void* const            parameter_bytes,
+                                                                 unsigned long                num_data_bytes,
+                            /*@null@*/ /*@observer@*/            const void* const            data_MOSI,
+                            /*@null@*/ /*@out@*/ /*@dependent@*/ void* const                  data_MISO );
+
+
+static inline int is_write_command( sflash_command_t cmd )
+{
+    return ( ( cmd == SFLASH_WRITE             ) ||
+             ( cmd == SFLASH_CHIP_ERASE1       ) ||
+             ( cmd == SFLASH_CHIP_ERASE2       ) ||
+             ( cmd == SFLASH_SECTOR_ERASE      ) ||
+             ( cmd == SFLASH_BLOCK_ERASE_MID   ) ||
+             ( cmd == SFLASH_BLOCK_ERASE_LARGE ) )? 1 : 0;
+}
+
+extern int sflash_platform_send_recv ( const void* platform_peripheral, /*@in@*/ /*@out@*/ sflash_platform_message_segment_t* segments, unsigned int num_segments  )
+{
+    UNUSED_PARAMETER( platform_peripheral );
+
+    if ( WICED_SUCCESS != wiced_spi_transfer( &wiced_spi_audioshield, (wiced_spi_message_segment_t*) segments, (uint16_t) num_segments ) )
+    {
+        return -1;
+    }
+
+    return 0;
+}
+int sflash_read_status_register( const sflash_handle_t* const handle, /*@out@*/  /*@dependent@*/ unsigned char* const dest_addr )
+{
+    return generic_sflash_command( handle, SFLASH_READ_STATUS_REGISTER, 0, NULL, (unsigned long) 1, NULL, dest_addr );
+}
+
+int generic_sflash_command(                                      const sflash_handle_t* const handle,
+                                                                 sflash_command_t             cmd,
+                                                                 unsigned long                num_initial_parameter_bytes,
+                            /*@null@*/ /*@observer@*/            const void* const            parameter_bytes,
+                                                                 unsigned long                num_data_bytes,
+                            /*@null@*/ /*@observer@*/            const void* const            data_MOSI,
+                            /*@null@*/ /*@out@*/ /*@dependent@*/ void* const                  data_MISO )
+{
+    int status;
+
+    sflash_platform_message_segment_t segments[3] =
+    {
+            { &cmd,            NULL,       (unsigned long) 1 },
+            { parameter_bytes, NULL,       num_initial_parameter_bytes },
+            /*@-compdef@*/ /* Lint: Tell lint that it is OK that data_MISO is not completely defined */
+            { data_MOSI,       data_MISO,  num_data_bytes }
+            /*@+compdef@*/
+    };
+
+    status = sflash_platform_send_recv( handle->platform_peripheral, segments, (unsigned int) 3  );
+    if ( status != 0 )
+    {
+        return status;
+    }
+
+    if ( is_write_command( cmd ) == 1 )
+    {
+        unsigned char status_register;
+        do
+        {
+            status = sflash_read_status_register( handle, &status_register );
+            if ( status != 0 )
+            {
+                return status;
+            }
+        } while( ( status_register & SFLASH_STATUS_REGISTER_BUSY ) != (unsigned char) 0 );
+
+    }
+    return 0;
+}
 
 
 void I2C_LowLevel_Init()
 {
 
-	/*
-		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
-
-	    TIM_TimeBaseInitTypeDef timerInitStructure;
-	    timerInitStructure.TIM_Prescaler = 54;
-	    timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	    timerInitStructure.TIM_Period = 10;
-	    timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-	    timerInitStructure.TIM_RepetitionCounter = 0;
-	    TIM_TimeBaseInit(TIM4, &timerInitStructure);
-	    TIM_Cmd(TIM4, ENABLE);
-
-	    TIM_OCInitTypeDef outputChannelInit = {0,};
-		outputChannelInit.TIM_OCMode = TIM_OCMode_PWM1;
-		outputChannelInit.TIM_Pulse = 5;
-		outputChannelInit.TIM_OutputState = TIM_OutputState_Enable;
-		outputChannelInit.TIM_OCPolarity = TIM_OCPolarity_High;
-
-		TIM_OC1Init(TIM4, &outputChannelInit);
-		TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);
-
-		GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_TIM4);
-
-		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-
-	   GPIO_InitTypeDef gpioStructure;
-	   gpioStructure.GPIO_Pin = GPIO_Pin_6;
-	   gpioStructure.GPIO_Mode = GPIO_Mode_AF;
-	   gpioStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	   GPIO_Init(GPIOB, &gpioStructure);
-	   */
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 
 	   GPIO_InitTypeDef gpioStructure;
@@ -232,4 +278,11 @@ void I2C_LowLevel_Init()
    	   codec_maple_reg_setup();
 	   GPIO_DeInit(GPIOB);
 
+
+
+	   if ( WICED_SUCCESS != wiced_spi_init( &wiced_spi_audioshield ) )
+	   {
+		   return ;
+	   }
 }
+

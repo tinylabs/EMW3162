@@ -95,4 +95,4 @@ build/src/audioboard.o: src/audioboard.c bsp/include/wiced.h \
  bsp/include/wiced_easy_setup.h bsp/include/WWD/wwd_debug.h \
  bsp/include/periph/stm32f2xx.h bsp/include/periph/stm32f2xx_i2c.h \
  bsp/include/periph/stm32f2xx_rcc.h bsp/include/periph/stm32f2xx_gpio.h \
- src/audioboard.h
+ src/audioboard.h src/spi.h
