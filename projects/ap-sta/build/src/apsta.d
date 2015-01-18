@@ -75,11 +75,11 @@ build/src/apsta.o: src/apsta.c bsp/include/wiced.h \
  bsp/arm/bin/Linux64//../../include/string.h \
  bsp/arm/bin/Linux64//../../include/sys/cdefs.h \
  bsp/arm/bin/Linux64//../../include/sys/string.h \
- ../../WICED_SRC/WICED/security/BESL/host/WICED/tls_types.h \
- ../../WICED_SRC/WICED/security/BESL/crypto/crypto_structures.h \
+ bsp/include_security/BESL/host/WICED/tls_types.h \
+ bsp/include_security/BESL/crypto/crypto_structures.h \
  bsp/arm/bin/Linux64//../../include/time.h \
  bsp/arm/bin/Linux64//../../include/machine/time.h \
- ../../WICED_SRC/WICED/security/BESL/host/WICED/cipher_suites.h \
+ bsp/include_security/BESL/host/WICED/cipher_suites.h \
  bsp/include/network/lwip/ipv4/lwip/ip_addr.h \
  bsp/include/network/lwip/lwip/opt.h bsp/include/network/lwip/lwipopts.h \
  bsp/include/WWD/network/wwd_network_constants.h \

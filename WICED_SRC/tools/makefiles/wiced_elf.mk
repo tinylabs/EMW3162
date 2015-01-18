@@ -268,6 +268,7 @@ ifneq (waf_bootloader,$(findstring waf_bootloader,$(CLEANED_BUILD_STRING)))
 	$(foreach var,$(LINK_LIBS), $(CP) $(var) ../WICED_BIN/lib/$(notdir $(var));)
 	$(foreach var,$(WICED_SDK_LINK_FILES), $(CP) $(var) ../WICED_BIN/lib/$(notdir $(var));)
 	-/bin/ln -s `pwd`/include ../WICED_BIN/include
+	-/bin/ln -s `pwd`/WICED/security ../WICED_BIN/include_security
 	-/bin/ln -s `pwd`/platform/include ../WICED_BIN/include/platform
 	-/bin/ln -s `pwd`/tools/ARM_GNU ../WICED_BIN/arm
 	$(CP) -r ./WICED/platform/MCU/STM32F2xx/GCC/* ../WICED_BIN/ld/

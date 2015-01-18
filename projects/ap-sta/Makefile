@@ -35,8 +35,8 @@ STRIP=$(ARM)arm-none-eabi-strip
 OBJCOPY=$(ARM)arm-none-eabi-objcopy
 
 ######################## DO NOT CHANGE ####################################
-TOBEFIXED= -I../../WICED_SRC/WICED/security/BESL/crypto/  -I ../../WICED_SRC/WICED/security/BESL/include/ -I../../WICED_SRC/WICED/security/BESL/host/WICED 
-INCLUDES=-I$(SOURCEDIR) -I../../WICED_SRC/WICED $(TOBEFIXED) -I$(BSP)/include -I$(BSP)/include/periph  -I$(BSP)/include/WWD -I$(BSP)/include/WWD/network -I$(BSP)/include/platform -I$(BSP)/include/libraries -I$(BSP)/include/WWD/internal  -I$(BSP)/include/WWD/internal/chips -I$(BSP)/include/RTOS/FreeRTOS -I$(BSP)/include/platform/ARM_CM3 -I$(BSP)/include/RTOS/FreeRTOS/ARM_CM3 -I$(BSP)/include/MXCHIP3162 -I$(BSP)/include/network/lwip -I$(BSP)/include/network/lwip/ipv4 -I$(BSP)/include/security/BESL/include
+TOBEFIXED= -I$(BSP)/include_security/BESL/include  -I$(BSP)/include_security/BESL/crypto -I$(BSP)/include_security/BESL/host/WICED/
+INCLUDES=-I$(SOURCEDIR) -I../../WICED_SRC/WICED $(TOBEFIXED) -I$(BSP)/include -I$(BSP)/include/periph  -I$(BSP)/include/WWD -I$(BSP)/include/WWD/network -I$(BSP)/include/platform -I$(BSP)/include/libraries -I$(BSP)/include/WWD/internal  -I$(BSP)/include/WWD/internal/chips -I$(BSP)/include/RTOS/FreeRTOS -I$(BSP)/include/platform/ARM_CM3 -I$(BSP)/include/RTOS/FreeRTOS/ARM_CM3 -I$(BSP)/include/MXCHIP3162 -I$(BSP)/include/network/lwip -I$(BSP)/include/network/lwip/ipv4 
 DEFINES=-DPLATFORM=\"MXCHIP3162\"
 CCFLAGS=$(DEFINES) -isystem $(ARM)/../../include -isystem $(ARM)/../../lib/include -isystem $(ARM)/../../lib/include-fixed -c  -MD -mthumb -mcpu=cortex-m3    -mlittle-endian   -Wall -fsigned-char -ffunction-sections -fdata-sections -fno-common $(INCLUDES) -DNDEBUG -ggdb -O3 
 LIBRARYLIST=./bsp/link.opts
