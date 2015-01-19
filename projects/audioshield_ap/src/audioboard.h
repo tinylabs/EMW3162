@@ -14,22 +14,6 @@ typedef enum {Error = 0, Success = !Error } Status;
 
 
 
-typedef enum
-{
-    SFLASH_WRITE_NOT_ALLOWED = 0,
-    SFLASH_WRITE_ALLOWED     = 1,
-
-} sflash_write_allowed_t;
-
-typedef /*@abstract@*/ /*@immutable@*/ struct
-{
-    uint32_t device_id;
-    void * platform_peripheral;
-    sflash_write_allowed_t write_allowed;
-} sflash_handle_t;
-
-
-
 
 
 #ifndef SAMPLE_RATE

@@ -175,84 +175,32 @@ void codec_maple_reg_setup(void) {
 
 }
 
-// TODO Move this
-int generic_sflash_command(                                      const sflash_handle_t* const handle,
-                                                                 sflash_command_t             cmd,
-                                                                 unsigned long                num_initial_parameter_bytes,
-                            /*@null@*/ /*@observer@*/            const void* const            parameter_bytes,
-                                                                 unsigned long                num_data_bytes,
-                            /*@null@*/ /*@observer@*/            const void* const            data_MOSI,
-                            /*@null@*/ /*@out@*/ /*@dependent@*/ void* const                  data_MISO );
-
-
-static inline int is_write_command( sflash_command_t cmd )
-{
-    return ( ( cmd == SFLASH_WRITE             ) ||
-             ( cmd == SFLASH_CHIP_ERASE1       ) ||
-             ( cmd == SFLASH_CHIP_ERASE2       ) ||
-             ( cmd == SFLASH_SECTOR_ERASE      ) ||
-             ( cmd == SFLASH_BLOCK_ERASE_MID   ) ||
-             ( cmd == SFLASH_BLOCK_ERASE_LARGE ) )? 1 : 0;
+int spi_send(platform_spi_message_segment_t* segments, uint16_t num_segments) {
+	if ( WICED_SUCCESS != wiced_spi_transfer( &wiced_spi_audioshield, (wiced_spi_message_segment_t*) segments, (uint16_t) num_segments ) )
+	{
+		return -1;
+	}
+	return 0;
 }
-
-extern int sflash_platform_send_recv ( const void* platform_peripheral, /*@in@*/ /*@out@*/ sflash_platform_message_segment_t* segments, unsigned int num_segments  )
+static wiced_result_t send_data( void *arg )
 {
-    UNUSED_PARAMETER( platform_peripheral );
+	const void*   tx_buffer = "test";
+	void*         rx_buffer;
+	unsigned long length = 1;
 
-    if ( WICED_SUCCESS != wiced_spi_transfer( &wiced_spi_audioshield, (wiced_spi_message_segment_t*) segments, (uint16_t) num_segments ) )
-    {
-        return -1;
-    }
+	platform_spi_message_segment_t segments[1] =
+	{
+			{ tx_buffer,            rx_buffer,       length }
+	};
+	if(spi_send(segments, 1) != 0) {
+		return WICED_ERROR;
+	}
+return WICED_SUCCESS;
 
-    return 0;
-}
-int sflash_read_status_register( const sflash_handle_t* const handle, /*@out@*/  /*@dependent@*/ unsigned char* const dest_addr )
-{
-    return generic_sflash_command( handle, SFLASH_READ_STATUS_REGISTER, 0, NULL, (unsigned long) 1, NULL, dest_addr );
-}
-
-int generic_sflash_command(                                      const sflash_handle_t* const handle,
-                                                                 sflash_command_t             cmd,
-                                                                 unsigned long                num_initial_parameter_bytes,
-                            /*@null@*/ /*@observer@*/            const void* const            parameter_bytes,
-                                                                 unsigned long                num_data_bytes,
-                            /*@null@*/ /*@observer@*/            const void* const            data_MOSI,
-                            /*@null@*/ /*@out@*/ /*@dependent@*/ void* const                  data_MISO )
-{
-    int status;
-
-    sflash_platform_message_segment_t segments[3] =
-    {
-            { &cmd,            NULL,       (unsigned long) 1 },
-            { parameter_bytes, NULL,       num_initial_parameter_bytes },
-            /*@-compdef@*/ /* Lint: Tell lint that it is OK that data_MISO is not completely defined */
-            { data_MOSI,       data_MISO,  num_data_bytes }
-            /*@+compdef@*/
-    };
-
-    status = sflash_platform_send_recv( handle->platform_peripheral, segments, (unsigned int) 3  );
-    if ( status != 0 )
-    {
-        return status;
-    }
-
-    if ( is_write_command( cmd ) == 1 )
-    {
-        unsigned char status_register;
-        do
-        {
-            status = sflash_read_status_register( handle, &status_register );
-            if ( status != 0 )
-            {
-                return status;
-            }
-        } while( ( status_register & SFLASH_STATUS_REGISTER_BUSY ) != (unsigned char) 0 );
-
-    }
-    return 0;
 }
 
 
+static wiced_timed_event_t spi_data_event;
 void I2C_LowLevel_Init()
 {
 
@@ -284,5 +232,7 @@ void I2C_LowLevel_Init()
 	   {
 		   return ;
 	   }
+	   wiced_rtos_register_timed_event( &spi_data_event, WICED_HARDWARE_IO_WORKER_THREAD, &send_data, 1, 0 );
+
 }
 
