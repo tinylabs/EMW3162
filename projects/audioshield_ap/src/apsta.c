@@ -37,22 +37,24 @@ static void transmit_over_i2c(uint32_t arg)
 void application_start(void)
 {
     /* Initialise the device */
-    wiced_init();
-    WPRINT_PLATFORM_INFO( ("WICED initialized.\n") );
-	I2C_LowLevel_Init();
+//    wiced_init();
+//    WPRINT_PLATFORM_INFO( ("WICED initialized.\n") );
+//
+//
+//    /* Bring up the softAP interface ------------------------------------------------------------- */
+//    wiced_network_up(WICED_AP_INTERFACE, WICED_USE_INTERNAL_DHCP_SERVER, &ap_ip_settings);
+//    WPRINT_PLATFORM_INFO( ("Soft AP Up.\n") );
+//    /* Start a DNS redirect server to redirect wiced.com to the AP webserver database*/
+//    wiced_dns_redirector_start( &dns_redirector, WICED_AP_INTERFACE );
+//    WPRINT_PLATFORM_INFO( ("DNS Redirector initialised\n") );
+//
+//    /* Start a web server on the AP interface */
+//    wiced_http_server_start( &ap_http_server, 80, ap_web_pages, WICED_AP_INTERFACE );
+//    WPRINT_PLATFORM_INFO( ("HTTP Daemon started\n") );
+//
+//    WPRINT_PLATFORM_INFO( ("Going to initialize Audio shield.\n") );
+    I2C_LowLevel_Init();
     WPRINT_PLATFORM_INFO( ("Audio shield initialized.\n") );
-    /* Bring up the softAP interface ------------------------------------------------------------- */
-    wiced_network_up(WICED_AP_INTERFACE, WICED_USE_INTERNAL_DHCP_SERVER, &ap_ip_settings);
-    WPRINT_PLATFORM_INFO( ("Soft AP Up.\n") );
-    /* Start a DNS redirect server to redirect wiced.com to the AP webserver database*/
-    wiced_dns_redirector_start( &dns_redirector, WICED_AP_INTERFACE );
-    WPRINT_PLATFORM_INFO( ("DNS Redirector initialised\n") );
-
-    /* Start a web server on the AP interface */
-    wiced_http_server_start( &ap_http_server, 80, ap_web_pages, WICED_AP_INTERFACE );
-    WPRINT_PLATFORM_INFO( ("HTTP Daemon started\n") );
-
-
 
 	//wiced_result_t result = wm8533_init(&ac);
 }
