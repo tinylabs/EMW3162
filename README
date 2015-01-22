@@ -7,6 +7,8 @@ STATUS: Fully working
 
 Removed all absolute paths. Should work on every linux now.
 
+IF YOU HAVE PROBLEMS BUILDING THE APP/SDK, PLEASE CONTACT ME.
+
 Steps to build binary:
 cd WICED_SRC
 ./build.sh
