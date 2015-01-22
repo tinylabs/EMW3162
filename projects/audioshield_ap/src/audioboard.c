@@ -309,9 +309,9 @@ void InitializeTimer()
 	RCC_APB1PeriphResetCmd( RCC_APB1Periph_TIM3, DISABLE );
 
     TIM_TimeBaseInitTypeDef timerInitStructure;
-    timerInitStructure.TIM_Prescaler = 64;
+    timerInitStructure.TIM_Prescaler = 0;
     timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    timerInitStructure.TIM_Period = 20;
+    timerInitStructure.TIM_Period = 271;
     timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     timerInitStructure.TIM_RepetitionCounter = 0;
     TIM_TimeBaseInit(TIM3, &timerInitStructure);
