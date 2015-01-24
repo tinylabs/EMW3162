@@ -114,11 +114,11 @@ $(BUILDDIR)/%.html.o: $(RESOURCES_HTML_C)
 
 ######### flash utils ##############3
 download: $(BINARY_FINAL)
-	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/bootloader.stripped.elf"  -c shutdown
+	sudo openocd -f ./jlink.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/bootloader.stripped.elf"  -c shutdown
 	sleep 1
-	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/dct.stripped.elf" -c shutdown
+	sudo openocd -f ./jlink.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/dct.stripped.elf" -c shutdown
 	sleep 1
-	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.stripped.elf" -c shutdown
+	sudo openocd -f ./jlink.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.stripped.elf" -c shutdown
 
 
 download_bin: $(BINARY_FINAL)

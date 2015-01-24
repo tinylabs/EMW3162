@@ -132,7 +132,7 @@ void codec_maple_reg_setup(void) {
   i2cbb(0x0c, 0x00); // power save registers -> all on
 	  mydelay(10);
 
-  i2cbb(0x0e, 0x03); // digital data format -> 16b spi mode
+  i2cbb(0x0e, 0x83); // digital data format -> 16b spi mode
 	  mydelay(10);
 
   i2cbb(0x00, LINVOL); // left input configure
@@ -181,110 +181,69 @@ void codec_maple_reg_setup(void) {
 
 }
 
-int spi_send(platform_spi_message_segment_t* segments, uint16_t num_segments) {
-	if ( WICED_SUCCESS != wiced_spi_transfer( &wiced_spi_audioshield, (wiced_spi_message_segment_t*) segments, (uint16_t) num_segments ) )
-	{
-		return -1;
-	}
-	return 0;
-}
-static xTimerHandle timer;
 
-
-int freqcounter = 0;
-int dir = 0;
-PLATFORM_DEFINE_ISR( timerhandler )
-{
-	if (TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)
-	{
-        TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
-        GPIO_WriteBit(GPIOC, SS, HIGH);
-        mydelay(1);
-        GPIO_WriteBit(GPIOC, SS, LOW);
-
-
-   // TIM3->SR = (uint16_t)~TIM_IT_Update;
-	}
-
-}
-
-int16_t rcvright = 0;
-int16_t rcvleft = 0;
+uint16_t rcvright = 0;
+uint16_t rcvleft = 0;
+#define buffersize 400
+uint16_t buffer1[buffersize];
+uint16_t buffer2[buffersize];
+int bufferpointer = 0;
+char start = 1;
+uint16_t * activebuffer;
+static uint16_t * readbuffer;
 
 platform_spi_config_t config;
+
+int writedata = 0;
 PLATFORM_DEFINE_ISR( timerhandle )
 {
-	if (TIM_GetITStatus(TIM3, TIM_IT_Update) == RESET)
-		{
-return;
+	if (TIM_GetITStatus(TIM3, TIM_IT_Update) == RESET || writedata == 1) {
+		return;
+	}
+
+	if(start == 1) {
+		activebuffer = buffer1;
+	}
+	if(bufferpointer == buffersize) {
+		if(activebuffer == buffer1) {
+			readbuffer = buffer1;
+			writedata = 1;
+			set_data(readbuffer);
+			writedata = 0;
+			//activebuffer = buffer2;
 		}
-	   platform_mcu_powersave_disable();
-
-	char * data = "0";
-	data[0] = freqcounter;
-
-	if(dir == 0)
-	freqcounter++;
-
-	if(dir == 1)
-		freqcounter--;
-
-	if(freqcounter > 5000)
-	dir = 1;
-
-	if(freqcounter < -5000)
-	dir = 0;
-
-
-
-
-
+//		if(activebuffer == buffer2) {
+//			readbuffer = buffer2;
+//			activebuffer = buffer1;
+//		}
+		bufferpointer = 0;
+	}
+	platform_mcu_powersave_disable();
 	GPIO_WriteBit(GPIOC, SS, HIGH);
+	/* Send the byte */
+	SPI_I2S_SendData(SPI1, rcvleft);
 
-	    /* Send the byte */
-	    SPI_I2S_SendData(SPI1, rcvleft );
+	/* Wait until the transmit buffer is empty */
+	while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET) {
+	}
+	GPIO_WriteBit(GPIOC, SS, LOW);
+	SPI_I2S_SendData(SPI1, rcvright);
+	/* Wait until a data is received */
+	while (SPI_I2S_GetFlagStatus( SPI1, SPI_I2S_FLAG_RXNE) == RESET) {
+	}
+	//  /* Get the received data */
+	rcvleft = SPI_I2S_ReceiveData( SPI1);
+	while (SPI_I2S_GetFlagStatus( SPI1, SPI_I2S_FLAG_RXNE) == RESET) {
+	}
+	activebuffer[bufferpointer] = rcvleft;
+	bufferpointer++;
 
-	    asm volatile ("nop"); // delay for appropriate timing
-	    asm volatile ("nop");
-	    asm volatile ("nop");
-	    asm volatile ("nop");
-	    asm volatile ("nop");
-	    asm volatile ("nop");
-	    asm volatile ("nop");
-	    asm volatile ("nop");
-	    asm volatile ("nop");
-	    asm volatile ("nop");
+	/* Get the received data */
+	rcvright = SPI_I2S_ReceiveData( SPI1);
 
+	platform_mcu_powersave_enable();
 
-
-
-		/* Wait until the transmit buffer is empty */
-		    while ( SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE ) == RESET )
-		    {
-		    }
-
-		    GPIO_WriteBit(GPIOC, SS, LOW);
-
-
-	    SPI_I2S_SendData(SPI1, rcvright );
-
-
-	    /* Wait until a data is received */
-	 	    while ( SPI_I2S_GetFlagStatus( SPI1, SPI_I2S_FLAG_RXNE ) == RESET )
-	 	    {
-	 	    }
-	  //  /* Get the received data */
-	    rcvleft = SPI_I2S_ReceiveData( SPI1 );
-
-	    while ( SPI_I2S_GetFlagStatus( SPI1, SPI_I2S_FLAG_RXNE ) == RESET )
-	 	    {
-	 	    }
-	    /* Get the received data */
-	    rcvright = SPI_I2S_ReceiveData( SPI1 );
-
-	    platform_mcu_powersave_enable();
-
-    TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+	TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 }
 
 void del(int m) {
@@ -311,7 +270,7 @@ void InitializeTimer()
     TIM_TimeBaseInitTypeDef timerInitStructure;
     timerInitStructure.TIM_Prescaler = 0;
     timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    timerInitStructure.TIM_Period = 2720;
+    timerInitStructure.TIM_Period = 5441;
     timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     timerInitStructure.TIM_RepetitionCounter = 0;
     TIM_TimeBaseInit(TIM3, &timerInitStructure);
@@ -336,76 +295,43 @@ extern const platform_spi_t        platform_spi_peripherals[];
 void I2C_LowLevel_Init()
 {
 	del(20); // DO NOT REMOVE DELAY, WILL ALMOST BRICK JTAG
-	void * pvTimerID;
-    //WPRINT_PLATFORM_INFO( ("Start I2C_LowLevel_Init.\n") );
 
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
-    //WPRINT_PLATFORM_INFO( ("done RCC_AHB1PeriphClockCmd Init.\n") );
 
-	//WICED_GPIO_14] = { GPIOA,  4 }, // SPI1_CS
+	GPIO_InitTypeDef gpioStructure;
+	gpioStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
+	gpioStructure.GPIO_Mode = GPIO_Mode_OUT;
+	gpioStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	gpioStructure.GPIO_OType = GPIO_OType_PP;
+	gpioStructure.GPIO_Speed = GPIO_Speed_25MHz;
+	GPIO_Init(GPIOB, &gpioStructure);
 
-	   GPIO_InitTypeDef gpioStructure;
-	   gpioStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
-	   gpioStructure.GPIO_Mode = GPIO_Mode_OUT;
-	   gpioStructure.GPIO_PuPd = GPIO_PuPd_UP;
-	   gpioStructure.GPIO_OType = GPIO_OType_PP;
-	   gpioStructure.GPIO_Speed = GPIO_Speed_25MHz;
-	   //GPIO_DeInit(GPIOB);
-	   GPIO_Init(GPIOB, &gpioStructure);
-	    //WPRINT_PLATFORM_INFO( ("done GPIOB_Init.\n") );
+	gpioStructure.GPIO_Pin = SS;
+	gpioStructure.GPIO_Mode = GPIO_Mode_OUT;
+	gpioStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	gpioStructure.GPIO_OType = GPIO_OType_PP;
+	gpioStructure.GPIO_Speed = GPIO_Speed_25MHz;
+	GPIO_WriteBit(GPIOC, SS, LOW);
+	GPIO_Init(GPIOC, &gpioStructure);
+	mydelay(500);
+	digitalWrite(SCL_PIN, HIGH); // release clock line
+	digitalWrite(SDA_PIN, HIGH); // release data line
+	mydelay(500);
 
+	codec_maple_reg_setup();
+	GPIO_DeInit(GPIOB);
 
-	   // wiced_gpio_init( WICED_GPIO_14, OUTPUT_PUSH_PULL );
-	   //wiced_gpio_output_high(WICED_GPIO_14);
-	   gpioStructure.GPIO_Pin = SS;
-	   gpioStructure.GPIO_Mode = GPIO_Mode_OUT;
-	   gpioStructure.GPIO_PuPd = GPIO_PuPd_UP;
-	   gpioStructure.GPIO_OType = GPIO_OType_PP;
-	   gpioStructure.GPIO_Speed = GPIO_Speed_25MHz;
-		GPIO_WriteBit(GPIOC, SS, LOW);
-
-	   GPIO_Init(GPIOC, &gpioStructure);
-	    //WPRINT_PLATFORM_INFO( ("done GPIOA_Init.\n") );
-
-	    mydelay(500);
-		//GPIO_WriteBit(GPIOB, GPIO_Pin_6, value);
-
-
-	   digitalWrite(SCL_PIN, HIGH); // release clock line
-	   digitalWrite(SDA_PIN, HIGH); // release data line
-   	   mydelay(500);
-
-	  // digitalWrite(SCL_PIN, HIGH);
-   	   codec_maple_reg_setup();
-	   GPIO_DeInit(GPIOB);
-
-       //WPRINT_PLATFORM_INFO( ("Audio shield initialized 2.\n") );
-
-	   config.chip_select = WICED_SPI_FLASH_CS; //&platform_gpio_pins[wiced_spi_audioshield.chip_select];
-	   config.speed       = 9000000;
-	   config.mode        = (SPI_CLOCK_RISING_EDGE | SPI_CLOCK_IDLE_LOW | SPI_NO_DMA | SPI_MSB_FIRST);
-	   config.bits        = 16;
-	   platform_spi_init( &platform_spi_peripherals[WICED_SPI_1], &config );
-
-	   WPRINT_PLATFORM_INFO( ("Audio shield initialized 2\n") );
-
-	   InitializeTimer();
+	config.chip_select = WICED_SPI_FLASH_CS; //&platform_gpio_pins[wiced_spi_audioshield.chip_select];
+	config.speed       = 9000000;
+	config.mode        = (SPI_CLOCK_RISING_EDGE | SPI_CLOCK_IDLE_LOW | SPI_NO_DMA | SPI_MSB_FIRST);
+	config.bits        = 16;
+	platform_spi_init( &platform_spi_peripherals[WICED_SPI_1], &config );
 
 
-	   EnableTimerInterrupt();
-		GPIO_ToggleBits(GPIOC, SS);
-
-	   //WPRINT_PLATFORM_INFO( ("Audio shield initialized 3.\n") );
-
-//	      NVIC_InitTypeDef nvicStructure;
-//	      nvicStructure.NVIC_IRQChannel = TIM3_IRQn;
-//	      nvicStructure.NVIC_IRQChannelPreemptionPriority = 0;
-//	      nvicStructure.NVIC_IRQChannelSubPriority = 1;
-//	      nvicStructure.NVIC_IRQChannelCmd = ENABLE;
-//	      NVIC_Init(&nvicStructure);
-	   //xTaskCreate(vTimer, "Timer", 256, NULL, 7, NULL);
+	InitializeTimer();
+	EnableTimerInterrupt();
 
 }
 PLATFORM_MAP_ISR( timerhandle, TIM3_irq )

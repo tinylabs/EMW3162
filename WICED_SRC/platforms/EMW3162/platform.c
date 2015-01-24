@@ -56,7 +56,7 @@ const platform_gpio_t platform_gpio_pins[] =
     [WICED_GPIO_2]  = { GPIOA, 12 },
     [WICED_GPIO_3]  = { GPIOC,  6 },
     [WICED_GPIO_4]  = { GPIOC,  7 },
-    [WICED_GPIO_5]  = { GPIOA,  4 },
+    [WICED_GPIO_5]  = { GPIOA,  3 },
     [WICED_GPIO_6]  = { GPIOA,  5 },
     [WICED_GPIO_7]  = { GPIOA,  6 },
     [WICED_GPIO_8]  = { GPIOA,  7 },
@@ -65,10 +65,10 @@ const platform_gpio_t platform_gpio_pins[] =
     [WICED_GPIO_11] = { GPIOB,  0 },
     [WICED_GPIO_12] = { GPIOB,  1 },
     [WICED_GPIO_13] = { GPIOA, 13 },
-    [WICED_GPIO_14] = { GPIOA, 14 },
-    [WICED_GPIO_15] = { GPIOA, 15 },
-    [WICED_GPIO_16] = { GPIOB,  3 },
-    [WICED_GPIO_17] = { GPIOB,  4 },
+    [WICED_GPIO_14] = { GPIOA,  4 }, // SPI1_CS
+    [WICED_GPIO_15] = { GPIOB,  5 }, // SPI1_MOSI
+    [WICED_GPIO_16] = { GPIOB,  3 }, // SPI1_SCK
+    [WICED_GPIO_17] = { GPIOB,  4 }, // SPI MISO
 };
 
 /* ADC peripherals. Used WICED/platform/MCU/wiced_platform_common.c */
@@ -102,9 +102,9 @@ const platform_spi_t platform_spi_peripherals[] =
         .gpio_af               = GPIO_AF_SPI1,
         .peripheral_clock_reg  = RCC_APB2Periph_SPI1,
         .peripheral_clock_func = RCC_APB2PeriphClockCmd,
-        .pin_mosi              = &platform_gpio_pins[WICED_GPIO_8],
-        .pin_miso              = &platform_gpio_pins[WICED_GPIO_7],
-        .pin_clock             = &platform_gpio_pins[WICED_GPIO_6],
+        .pin_mosi              = &platform_gpio_pins[WICED_GPIO_15],
+        .pin_miso              = &platform_gpio_pins[WICED_GPIO_17],
+        .pin_clock             = &platform_gpio_pins[WICED_GPIO_16],
         .tx_dma =
         {
             .controller        = DMA2,
@@ -205,6 +205,16 @@ const platform_i2c_t platform_i2c_peripherals[] =
         .rx_dma_channel          = DMA_Channel_1,
         .gpio_af                 = GPIO_AF_I2C1
     },
+};
+
+
+const wiced_spi_device_t wiced_spi_audioshield =
+{
+    .port        = WICED_SPI_1,
+    .chip_select = WICED_SPI_FLASH_CS,
+    .speed       = 9000000,
+    .mode        = (SPI_CLOCK_RISING_EDGE | SPI_CLOCK_IDLE_HIGH | SPI_NO_DMA | SPI_MSB_FIRST),
+    .bits        = 8
 };
 
 

@@ -105,6 +105,8 @@ typedef struct
 #ifdef WICED_PLATFORM_INCLUDES_SPI_FLASH
 extern const wiced_spi_device_t wiced_spi_flash;
 #endif
+extern const wiced_spi_device_t wiced_spi_audioshield;
+
 
 /******************************************************
  * @endcond           Function Declarations
