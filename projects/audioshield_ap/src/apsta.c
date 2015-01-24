@@ -40,7 +40,7 @@ static int process_data_handler( const char* url, wiced_tcp_stream_t* stream, vo
 }
 
 #define UDP_TARGET_PORT             50007
-#define UDP_TARGET_IP MAKE_IPV4_ADDRESS(192,168,0,255)
+#define UDP_TARGET_IP MAKE_IPV4_ADDRESS(192,168,0,2)
 #define headerlength  12
 #define UDP_MAX_DATA_LENGTH         (400)
 wiced_udp_socket_t  udp_socket;
@@ -59,6 +59,7 @@ wiced_result_t tx_udp_packet()
 	    char * udp_data;
 	    int sizeinchar = UDP_MAX_DATA_LENGTH*sizeof(uint16_t);
 	    if(sendbusy == 0) {
+	    	// No new packages yet
 	    	return WICED_SUCCESS;
 	    }
 	    /* Create the UDP packet */
@@ -82,7 +83,7 @@ wiced_result_t tx_udp_packet()
 	        wiced_packet_delete( packet ); /* Delete packet, since the send failed */
 	        return WICED_ERROR;
 	    }
-#define RTPDEBUG 1
+#undef RTPDEBUG
 #ifdef RTPDEBUG
 	    int i;
 	    printf("\r\n\r\n");
@@ -110,6 +111,8 @@ void set_data(uint16_t* data) {
 		timer += 441;
 		seqnr++;
 		sendbusy = 1;
+	} else {
+		 WPRINT_PLATFORM_INFO( ("Dropping packages.\n") );
 	}
 }
 

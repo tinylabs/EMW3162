@@ -1,1 +1,14 @@
+gst-launch udpsrc uri="udp://192.168.0.2:50007" buffer-size=0 ! audioparse rate=11025 signed=true width=16 depth=16 format=int channels=1 ! alsasink sync=false
+
+
 gst-launch udpsrc uri="udp://192.168.0.255:50007" buffer-size=99999999 ! audioparse rate=11025 signed=true width=16 depth=16 format=int channels=1 ! alsasink sync=false
+
+gst-launch udpsrc uri="udp://192.168.0.255:50007" buffer-size=99999999 ! audioparse rate=11025 signed=true width=16 depth=16 format=int channels=1 ! queue min-threshold-buffers=5 max-size-buffers=10 ! alsasink sync=false
+
+
+gst-launch udpsrc uri="udp://192.168.0.255:50007" buffer-size=99999999 blocksize=10 ! queue !  filesink location=./test.bin
+
+
+
+gst-launch -v filesrc location=./test.bin ! audioparse rate=11025 signed=true width=16 depth=16 format=int channels=1 ! alsasink sync=false
+

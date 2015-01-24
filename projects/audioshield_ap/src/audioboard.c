@@ -197,8 +197,12 @@ platform_spi_config_t config;
 int writedata = 0;
 PLATFORM_DEFINE_ISR( timerhandle )
 {
-	if (TIM_GetITStatus(TIM3, TIM_IT_Update) == RESET || writedata == 1) {
+	if (TIM_GetITStatus(TIM3, TIM_IT_Update) == RESET) {
 		return;
+	}
+	if(writedata == 1) {
+	WPRINT_PLATFORM_INFO( ("Dropping packages SPI.\n") );
+	return;
 	}
 
 	if(start == 1) {
@@ -270,11 +274,10 @@ void InitializeTimer()
     TIM_TimeBaseInitTypeDef timerInitStructure;
     timerInitStructure.TIM_Prescaler = 0;
     timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    timerInitStructure.TIM_Period = 5441;
+    timerInitStructure.TIM_Period = 2720;
     timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     timerInitStructure.TIM_RepetitionCounter = 0;
     TIM_TimeBaseInit(TIM3, &timerInitStructure);
-
     TIM_ClearITPendingBit( TIM3, TIM_IT_Update );
     TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
     TIM_UpdateRequestConfig( TIM3, TIM_UpdateSource_Regular );

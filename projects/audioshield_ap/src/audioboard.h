@@ -17,7 +17,7 @@ typedef enum {Error = 0, Success = !Error } Status;
 
 
 #ifndef SAMPLE_RATE
-  #define SAMPLE_RATE 22
+  #define SAMPLE_RATE 44
 #elif (SAMPLE_RATE == 88)||(SAMPLE_RATE == 44)||(SAMPLE_RATE == 22)||(SAMPLE_RATE == 8)||(SAMPLE_RATE == 2)
 #else
   #error SAMPLE_RATE value not defined
