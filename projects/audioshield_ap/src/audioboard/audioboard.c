@@ -16,9 +16,11 @@
 #include "audioboard.h"
 #include "spi.h"
 #include "wiced_platform.h"
+#include "platform.h"
 #include "queue.h"
 #include "i2c.h"
 
+#define OUTPUT_LIVE 1
 
 extern const platform_spi_t        platform_spi_peripherals[];
 #define WICED_SPI_FLASH_CS ( WICED_GPIO_5 )
@@ -27,7 +29,7 @@ platform_spi_config_t config;
 #define rcvbuffersize 1000
 uint16_t * activereceivebuffer;
 int receivebufferpointer = 0;
-#define maxreadbufsize  2
+#define maxreadbufsize  4
 uint16_t * readbufferarr[maxreadbufsize];
 int curractivereadbuffer = 0;
 queue read_queue;
@@ -60,11 +62,11 @@ void AllocateUDPBuffers() {
 	activereceivebuffer = readbufferarr[curractivereadbuffer];
 }
 
+	platform_gpio_t io = { GPIOC,  6 };
 
 void Audioboard_Receive_audio(char* data, int length) {
-	uint16_t * tmpbuff = readbufferarr[1];
+	uint16_t * tmpbuff = readbufferarr[curractivereadbuffer];
 	recvlength = (length/2);
-
 	memcpy(tmpbuff, data, (length) * sizeof(char));
 	enqueue(&read_queue, tmpbuff);
 
@@ -105,7 +107,7 @@ PLATFORM_DEFINE_ISR( timerhandle ) {
 	if(bufferpointer == buffersize) { // we read a new package from spi, transmit
 		if(getqueuesize(&write_queue) >= maxbufsize) {	// queue a bit
 			uint16_t * tmpdata = (uint16_t *) dequeue(&write_queue); // get from queue
-			SendUdpData(tmpdata); // send over udp
+			SendUdpData(tmpdata, buffersize * 2); // send over udp
 		}
 		enqueue(&write_queue, (void*) activewritebuffer); // store new package for next round
 		switchactivewritebuffer(); // switch to empty package for write
@@ -114,13 +116,20 @@ PLATFORM_DEFINE_ISR( timerhandle ) {
 
 	GPIO_WriteBit(GPIOC, SS, HIGH);
 	/* Send the byte */
-	SPI_I2S_SendData(SPI1, activereceivebuffer[receivebufferpointer]);
-
+	if (platform_gpio_input_get(&io)) {
+		SPI_I2S_SendData(SPI1, rcvright);
+	} else {
+		SPI_I2S_SendData(SPI1, activereceivebuffer[receivebufferpointer]);
+	}
 	/* Wait until the transmit buffer is empty */
 	while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET) {
 	}
 	GPIO_WriteBit(GPIOC, SS, LOW);
-	SPI_I2S_SendData(SPI1, rcvright);
+	if (platform_gpio_input_get(&io)) {
+		SPI_I2S_SendData(SPI1, rcvright);
+	} else {
+		SPI_I2S_SendData(SPI1, activereceivebuffer[receivebufferpointer]);
+	}
 	/* Wait until a data is received */
 	while (SPI_I2S_GetFlagStatus( SPI1, SPI_I2S_FLAG_RXNE) == RESET) {
 	}
@@ -181,7 +190,8 @@ void Audioboard_Init()
 
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
-
+	
+	
 
 	GPIO_InitTypeDef gpioStructure;
 	gpioStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
@@ -216,7 +226,9 @@ void Audioboard_Init()
 	AllocateUDPBuffers();
 	InitializeTimer(); // Setup timer for spi audio samping
 	EnableTimerInterrupt(); // setup interrupt and start timer
-
+	
+	platform_gpio_init(&io, INPUT_PULL_UP );
+    
 
 }
 PLATFORM_MAP_ISR( timerhandle, TIM3_irq )

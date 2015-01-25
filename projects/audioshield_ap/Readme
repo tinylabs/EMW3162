@@ -2,11 +2,18 @@
 PLAY FROM UDP
  gst-launch udpsrc uri="udp://192.168.0.2:50007" buffer-size=0 ! audioparse rate=22050 signed=true width=16 depth=16 format=int channels=1 ! alsasink sync=false
 
+
+
 DUMP RAW AUDIO TO UDP
 gst-launch filesrc blocksize=800 location=dump.bin ! audioparse rate=22050 signed=false width=16 depth=16 format=int channels=1 ! udpsink host=192.168.0.1 port=50007
 
+
+
 SILENCE
 gst-launch filesrc blocksize=800 location=silence.bin ! audioparse rate=22050 signed=false width=16 depth=16 format=int channels=1 ! udpsink host=192.168.0.1 port=50007
+
+
+
 
 DUMP INCOMMING AUDIO
 gst-launch udpsrc uri="udp://192.168.0.2:50007" buffer-size=200000 ! audioparse rate=22050 signed=true width=16 depth=16 format=int channels=1 ! filesink location=dump.bin

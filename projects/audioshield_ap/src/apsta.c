@@ -39,16 +39,16 @@ static int process_data_handler( const char* url, wiced_tcp_stream_t* stream, vo
 #define UDP_TARGET_PORT             50007
 #define UDP_TARGET_IP MAKE_IPV4_ADDRESS(192,168,0,2)
 #define headerlength  12
-#define UDP_MAX_DATA_LENGTH         (400)
+#define UDP_MAX_DATA_LENGTH         (2000)
 wiced_udp_socket_t  udp_socket;
 static wiced_timed_event_t udp_tx_event;
 static wiced_timed_event_t process_udp_rx_event;
 
-uint16_t senddata[UDP_MAX_DATA_LENGTH];
+char senddata[UDP_MAX_DATA_LENGTH];
 char sendbusy = 0;
 uint32_t timer = 0;
 int seqnr = 0;
-
+int tosendlengthinchar = 0;
 
 wiced_result_t tx_udp_packet()
 {
@@ -56,7 +56,7 @@ wiced_result_t tx_udp_packet()
 	    uint16_t                 available_data_length;
 	    const wiced_ip_address_t INITIALISER_IPV4_ADDRESS( target_ip_addr, UDP_TARGET_IP );
 	    char * udp_data;
-	    int sizeinchar = UDP_MAX_DATA_LENGTH*sizeof(uint16_t);
+	    int sizeinchar = tosendlengthinchar *sizeof(char);
 	    if(sendbusy == 0) {
 	    	// No new packages yet
 	    	return WICED_SUCCESS;
@@ -71,7 +71,7 @@ wiced_result_t tx_udp_packet()
 	    /* Write packet number into the UDP packet data */
 	    memcpy(udp_data, senddata, sizeinchar);
 	    sendbusy = 0;
-	    udp_data[sizeinchar] = 0;
+	    udp_data[tosendlengthinchar+1] = 0;
 	    /* Set the end of the data portion */
 	    wiced_packet_set_data_end( packet, (uint8_t*) udp_data + sizeinchar);
 
@@ -99,14 +99,15 @@ wiced_result_t tx_udp_packet()
 }
 
 
-void SendUdpData(uint16_t* data) {
+void SendUdpData(uint16_t* data, int length) {
 	if(sendbusy == 0) {
 		 	  	  	  	  // RTP  payloadt	seqnr1	seqnr2	time1	time2   time3,    time4, unique ids					0x84, 0xdf, 0x13, 0x5a
 		//char header[] = { 	0x80, 0x00, 	((seqnr & 0xFF00) >> 8), 	seqnr, 	((timer & 0xFF000000) >> 24),   ((timer & 0xFF0000) >> 16),   ((timer & 0xFF00) >> 8), timer, ((seqnr & 0xFF00) >> 24), 	((seqnr & 0xFF00) >> 16), ((seqnr & 0xFF00) >> 8), 	seqnr};
 		//int headlength16 = headerlength / 2;
 		//memcpy(senddata, header, headerlength * sizeof(char) );
 		//memcpy(&senddata[headlength16], data, (UDP_MAX_DATA_LENGTH-(headerlength)) * sizeof(uint16_t));
-		memcpy(senddata, data, (UDP_MAX_DATA_LENGTH) * sizeof(uint16_t));
+		tosendlengthinchar = length;
+		memcpy(senddata, data, (UDP_MAX_DATA_LENGTH) * sizeof(char));
 		//free((void*) data);
 		//timer += 441;
 		//seqnr++;
@@ -121,22 +122,29 @@ wiced_result_t process_received_udp_packet()
     static uint16_t           rx_data_length;
     uint16_t                  available_data_length;
 
+
+
     /* Wait for UDP packet */
-    wiced_result_t result = wiced_udp_receive( &udp_socket, &packet, 1 );
+    wiced_result_t result = WICED_SUCCESS;
+	while(result == WICED_SUCCESS) {
+		result = wiced_udp_receive( &udp_socket, &packet, 10 );
+		if ( ( result == WICED_ERROR ) || ( result == WICED_TIMEOUT ) )
+		{
+			return result;
+		}
+		
+		/* Extract the received data from the UDP packet */
+		wiced_packet_get_data( packet, 0, (uint8_t**) &rx_data, &rx_data_length, &available_data_length );
 
-    if ( ( result == WICED_ERROR ) || ( result == WICED_TIMEOUT ) )
-    {
-        return result;
+		/* Null terminate the received data, just in case the sender didn't do this */
+		rx_data[ rx_data_length ] = '\x0';
+		Audioboard_Receive_audio(rx_data, rx_data_length);
+	
+		//SendUdpData((uint16_t *) rx_data, rx_data_length);
+		/* Delete the received packet, it is no longer needed */
+		wiced_packet_delete( packet );
     }
-    /* Extract the received data from the UDP packet */
-    wiced_packet_get_data( packet, 0, (uint8_t**) &rx_data, &rx_data_length, &available_data_length );
-
-    /* Null terminate the received data, just in case the sender didn't do this */
-    rx_data[ rx_data_length ] = '\x0';
-    Audioboard_Receive_audio(rx_data, rx_data_length+1);
-
-    /* Delete the received packet, it is no longer needed */
-    wiced_packet_delete( packet );
+    
 
     return WICED_SUCCESS;
 }
