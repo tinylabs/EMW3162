@@ -95,4 +95,4 @@ build/src/apsta.o: src/apsta.c bsp/include/wiced.h \
  bsp/include/wiced_easy_setup.h bsp/include/WWD/wwd_debug.h \
  bsp/include/libraries/http_server.h bsp/include/wiced_resource.h \
  bsp/include/resources.h bsp/include/libraries/dns_redirect.h \
- src/audioboard.h bsp/include/periph/stm32f2xx_i2c.h
+ src/audioboard/audioboard.h bsp/include/periph/stm32f2xx_i2c.h

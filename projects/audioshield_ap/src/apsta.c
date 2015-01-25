@@ -4,7 +4,7 @@
 #include "dns_redirect.h"
 //#include "wifi_config_dct.h"
 //#include "AudioCodec.h"
-#include "audioboard.h"
+#include "audioboard/audioboard.h"
 
 static const wiced_ip_setting_t ap_ip_settings =
 {
@@ -28,14 +28,11 @@ static dns_redirector_t    dns_redirector;
 /******************************************************
  *               Function Definitions
  ******************************************************/
-I2C_TypeDef i2cbus;
 
-extern int16_t * activebuffer;
 static int process_data_handler( const char* url, wiced_tcp_stream_t* stream, void* arg )
 {
-	char * res = activebuffer;
+	char * res = "test";
 	wiced_tcp_stream_write( stream, res, strlen(res) );
-
 	 return 0;
 }
 
@@ -45,6 +42,8 @@ static int process_data_handler( const char* url, wiced_tcp_stream_t* stream, vo
 #define UDP_MAX_DATA_LENGTH         (400)
 wiced_udp_socket_t  udp_socket;
 static wiced_timed_event_t udp_tx_event;
+static wiced_timed_event_t process_udp_rx_event;
+
 uint16_t senddata[UDP_MAX_DATA_LENGTH];
 char sendbusy = 0;
 uint32_t timer = 0;
@@ -100,20 +99,46 @@ wiced_result_t tx_udp_packet()
 }
 
 
-void set_data(uint16_t* data) {
+void SendUdpData(uint16_t* data) {
 	if(sendbusy == 0) {
 		 	  	  	  	  // RTP  payloadt	seqnr1	seqnr2	time1	time2   time3,    time4, unique ids					0x84, 0xdf, 0x13, 0x5a
-		char header[] = { 	0x80, 0x00, 	((seqnr & 0xFF00) >> 8), 	seqnr, 	((timer & 0xFF000000) >> 24),   ((timer & 0xFF0000) >> 16),   ((timer & 0xFF00) >> 8), timer, ((seqnr & 0xFF00) >> 24), 	((seqnr & 0xFF00) >> 16), ((seqnr & 0xFF00) >> 8), 	seqnr};
-		int headlength16 = headerlength / 2;
-		memcpy(senddata, header, headerlength * sizeof(char) );
+		//char header[] = { 	0x80, 0x00, 	((seqnr & 0xFF00) >> 8), 	seqnr, 	((timer & 0xFF000000) >> 24),   ((timer & 0xFF0000) >> 16),   ((timer & 0xFF00) >> 8), timer, ((seqnr & 0xFF00) >> 24), 	((seqnr & 0xFF00) >> 16), ((seqnr & 0xFF00) >> 8), 	seqnr};
+		//int headlength16 = headerlength / 2;
+		//memcpy(senddata, header, headerlength * sizeof(char) );
 		//memcpy(&senddata[headlength16], data, (UDP_MAX_DATA_LENGTH-(headerlength)) * sizeof(uint16_t));
 		memcpy(senddata, data, (UDP_MAX_DATA_LENGTH) * sizeof(uint16_t));
-		timer += 441;
-		seqnr++;
+		//free((void*) data);
+		//timer += 441;
+		//seqnr++;
 		sendbusy = 1;
-	} else {
-		 WPRINT_PLATFORM_INFO( ("Dropping packages.\n") );
 	}
+}
+
+wiced_result_t process_received_udp_packet()
+{
+    wiced_packet_t*           packet;
+    char*                     rx_data;
+    static uint16_t           rx_data_length;
+    uint16_t                  available_data_length;
+
+    /* Wait for UDP packet */
+    wiced_result_t result = wiced_udp_receive( &udp_socket, &packet, 1 );
+
+    if ( ( result == WICED_ERROR ) || ( result == WICED_TIMEOUT ) )
+    {
+        return result;
+    }
+    /* Extract the received data from the UDP packet */
+    wiced_packet_get_data( packet, 0, (uint8_t**) &rx_data, &rx_data_length, &available_data_length );
+
+    /* Null terminate the received data, just in case the sender didn't do this */
+    rx_data[ rx_data_length ] = '\x0';
+    Audioboard_Receive_audio(rx_data, rx_data_length+1);
+
+    /* Delete the received packet, it is no longer needed */
+    wiced_packet_delete( packet );
+
+    return WICED_SUCCESS;
 }
 
 void application_start(void)
@@ -121,7 +146,6 @@ void application_start(void)
     /* Initialise the device */
     wiced_init();
     WPRINT_PLATFORM_INFO( ("WICED initialized.\n") );
-
 
     /* Bring up the softAP interface ------------------------------------------------------------- */
     wiced_network_up(WICED_AP_INTERFACE, WICED_USE_INTERNAL_DHCP_SERVER, &ap_ip_settings);
@@ -135,15 +159,16 @@ void application_start(void)
     WPRINT_PLATFORM_INFO( ("HTTP Daemon started\n") );
 
     WPRINT_PLATFORM_INFO( ("Going to initialize Audio shield.\n") );
-    I2C_LowLevel_Init();
+    Audioboard_Init();
     WPRINT_PLATFORM_INFO( ("Audio shield initialized.\n") );
-
 
     if ( wiced_udp_create_socket( &udp_socket, UDP_TARGET_PORT, WICED_AP_INTERFACE ) != WICED_SUCCESS )
    {
 	   WPRINT_APP_INFO( ("UDP socket creation failed\n") );
    }
+
    wiced_rtos_register_timed_event( &udp_tx_event, WICED_NETWORKING_WORKER_THREAD, &tx_udp_packet, 1, senddata );
+   wiced_rtos_register_timed_event( &process_udp_rx_event, WICED_NETWORKING_WORKER_THREAD, &process_received_udp_packet, 1, 0 );
 
 	//wiced_result_t result = wm8533_init(&ac);
 }
