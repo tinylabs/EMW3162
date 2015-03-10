@@ -15,3 +15,5 @@ cd WICED_SRC
 cd ../projects/ap-sta
 make
 make download
+
+Join the chat at https://gitter.im/willemwouters/EMW3162_WICED
