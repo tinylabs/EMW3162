@@ -124,8 +124,8 @@ download: $(BINARY_FINAL)
 
 
 download_bin: $(BINARY_FINAL)
-	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/bootloader.bin 0x8000000"  -c shutdown
+	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/bootloader.stripped.elf"  -c shutdown
 	sleep 1
-	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/dct.bin 0x8004000" -c shutdown
+	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/dct.stripped.elf" -c shutdown
 	sleep 1
-	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.bin 0x8008000" -c shutdown
+	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.stripped.elf" -c shutdown
