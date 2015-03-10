@@ -23,3 +23,5 @@ gst-launch udpsrc uri="udp://192.168.0.2:50007" buffer-size=200000 ! audioparse 
 NOT WORKING YET
 gst-launch filesrc blocksize=400 location=fd.mp3  ! audio/mpeg, mpegversion=1, layer=3! ffdec_mp3 ! audioparse rate=8000 channels=1 ! udpsink host=192.168.0.1 port=50007
 
+gst-launch alsasrc device=hw:1 num-buffers=1000  ! audioconvert ! audioresample ! audio/x-raw-int,rate=22050,channels=2 !  udpsink blocksize=20 host=192.168.0.1 port=50007
+

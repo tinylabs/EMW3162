@@ -65,7 +65,7 @@ wiced_result_t tx_udp_packet()
 	    if ( wiced_packet_create_udp( &udp_socket, sizeinchar+1, &packet, (uint8_t**) &udp_data, &available_data_length ) != WICED_SUCCESS )
 	    {
 	        WPRINT_APP_INFO( ("UDP tx packet creation failed\n") );
-	        return WICED_ERROR;
+	        return WICED_SUCCESS;
 	    }
 
 	    /* Write packet number into the UDP packet data */
@@ -80,7 +80,7 @@ wiced_result_t tx_udp_packet()
 	    {
 	        WPRINT_APP_INFO( ("UDP packet send failed\n") );
 	        wiced_packet_delete( packet ); /* Delete packet, since the send failed */
-	        return WICED_ERROR;
+	        return WICED_SUCCESS;
 	    }
 #undef RTPDEBUG
 #ifdef RTPDEBUG
@@ -173,10 +173,14 @@ void application_start(void)
     if ( wiced_udp_create_socket( &udp_socket, UDP_TARGET_PORT, WICED_AP_INTERFACE ) != WICED_SUCCESS )
    {
 	   WPRINT_APP_INFO( ("UDP socket creation failed\n") );
+
+
+   } else {
+	   wiced_rtos_register_timed_event( &udp_tx_event, WICED_NETWORKING_WORKER_THREAD, &tx_udp_packet, 1, senddata );
+	    wiced_rtos_register_timed_event( &process_udp_rx_event, WICED_NETWORKING_WORKER_THREAD, &process_received_udp_packet, 1, 0 );
+
    }
 
-   wiced_rtos_register_timed_event( &udp_tx_event, WICED_NETWORKING_WORKER_THREAD, &tx_udp_packet, 1, senddata );
-   wiced_rtos_register_timed_event( &process_udp_rx_event, WICED_NETWORKING_WORKER_THREAD, &process_received_udp_packet, 1, 0 );
 
 	//wiced_result_t result = wm8533_init(&ac);
 }
