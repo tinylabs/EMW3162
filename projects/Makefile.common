@@ -17,7 +17,7 @@ OBJCOPY=$(ARM)arm-none-eabi-objcopy
 
 ######################## DO NOT CHANGE ####################################
 TOBEFIXED= -I$(BSP)/include_security/BESL/include  -I$(BSP)/include_security/BESL/crypto -I$(BSP)/include_security/BESL/host/WICED/
-INCLUDES=-I$(SOURCEDIR) -I../../WICED_SRC/WICED $(TOBEFIXED) -I$(BSP)/include -I$(BSP)/include/periph  -I$(BSP)/include/WWD -I$(BSP)/include/WWD/network -I$(BSP)/include/platform -I$(BSP)/include/libraries -I$(BSP)/include/WWD/internal  -I$(BSP)/include/WWD/internal/chips -I$(BSP)/include/RTOS/FreeRTOS -I$(BSP)/include/platform/ARM_CM3 -I$(BSP)/include/RTOS/FreeRTOS/ARM_CM3 -I$(BSP)/include/MXCHIP3162 -I$(BSP)/include/network/lwip -I$(BSP)/include/network/lwip/ipv4 
+INCLUDES=-I$(SOURCEDIR) -I$(ROOT_DIR)/../WICED_SRC/WICED $(TOBEFIXED) -I$(BSP)/include -I$(BSP)/include/periph  -I$(BSP)/include/WWD -I$(BSP)/include/WWD/network -I$(BSP)/include/platform -I$(BSP)/include/libraries -I$(BSP)/include/WWD/internal  -I$(BSP)/include/WWD/internal/chips -I$(BSP)/include/RTOS/FreeRTOS -I$(BSP)/include/platform/ARM_CM3 -I$(BSP)/include/RTOS/FreeRTOS/ARM_CM3 -I$(BSP)/include/MXCHIP3162 -I$(BSP)/include/network/lwip -I$(BSP)/include/network/lwip/ipv4 
 DEFINES=-DPLATFORM=\"MXCHIP3162\"
 CCFLAGS=$(DEFINES) -isystem $(ARM)/../../include -isystem $(ARM)/../../lib/include -isystem $(ARM)/../../lib/include-fixed -c  -MD -mthumb -mcpu=cortex-m3    -mlittle-endian   -Wall -fsigned-char -ffunction-sections -fdata-sections -fno-common $(INCLUDES) -DNDEBUG -ggdb -O3 
 LIBRARYLIST=./bsp/link.opts
@@ -36,6 +36,7 @@ RESOURCES_PNG_C += $(addprefix $(BUILDDIR)/,$(PNGS:%.png=%.png.c))
 RESOURCE_A :=bsp/lib/resources.a ### DO NOT RENAME THIS, OVERWRITES THE RESOURCES NEEDED FOR BOOTLOADER
 RESOURCE_H :=bsp/include/resources.h ### DO NOT RENAME THIS, OVERWRITES THE RESOURCES NEEDED FOR BOOTLOADER
 
+ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 
 all: $(BINARY_FINAL) $(DCT_BINARY_FINAL)
@@ -57,7 +58,7 @@ $(DCT_BINARY_STRIPPED): $(DCT_BINARY)
 	$(STRIP) -o $@ $(STRIPFLAGS) $<
 
 $(DCT_BINARY): $(DCT_OBJECT) 
-	$(CP)  --static -Wl,-static -Wl,--warn-common -Wl,--gc-sections -Wl,-O3 -Wl,--cref  -mthumb -mcpu=cortex-m3 -Wl,-A,thumb -mlittle-endian -nostartfiles -Wl,--defsym,__STACKSIZE__=800 -L ../../WICED_SRC/WICED/platform/MCU/STM32F2xx/GCC -L ../../WICED_SRC/WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5 -Wl,-T ../../WICED_SRC/WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5/dct.ld -Wl,-Map,$(BUILDDIR)/dct/DCT.map -o $(DCT_BINARY) $(DCT_OBJECT)
+	$(CP)  --static -Wl,-static -Wl,--warn-common -Wl,--gc-sections -Wl,-O3 -Wl,--cref  -mthumb -mcpu=cortex-m3 -Wl,-A,thumb -mlittle-endian -nostartfiles -Wl,--defsym,__STACKSIZE__=800 -L $(ROOT_DIR)/../WICED_SRC/WICED/platform/MCU/STM32F2xx/GCC -L $(ROOT_DIR)/../WICED_SRC/WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5 -Wl,-T $(ROOT_DIR)/../WICED_SRC/WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5/dct.ld -Wl,-Map,$(BUILDDIR)/dct/DCT.map -o $(DCT_BINARY) $(DCT_OBJECT)
 	
 $(BUILDDIR)/dct/%.o: $(DCT_SRC)
 	@mkdir -p $(@D)
