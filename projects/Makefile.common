@@ -96,7 +96,7 @@ $(RESOURCE_H): $(RESOURCE_A)
 	rm $@
 	perl $(BSP)/tools/text_to_c/resources_header.pl $(RESOURCES_HTML_C) $(RESOURCES_PNG_C) >> $@
 
-$(RESOURCE_A): $(RESOURCES)
+$(RESOURCE_A): $(RESOURCES) $(RESOURCES_HTML_C) $(RESOURCES_PNG_C)
 	$(AR) -rcs $@ $(RESOURCES)
 
 $(BUILDDIR)/%.png.c: %.png
