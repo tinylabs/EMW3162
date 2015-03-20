@@ -1,0 +1,4 @@
+*.o
+*.so
+WICED_BIN
+build
