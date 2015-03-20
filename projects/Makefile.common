@@ -135,9 +135,9 @@ download_bus: $(BINARY_FINAL)
 
 
 download_busblaster: $(BINARY_FINAL)
-        sudo openocd -f ./busblaster.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/bootloader.stripped.elf"  -c shutdown
-        sleep 1
-        sudo openocd -f ./busblaster.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/dct.stripped.elf" -c shutdown
-        sleep 1
-        sudo openocd -f ./busblaster.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.stripped.elf" -c shutdown
+	sudo openocd -f ./busblaster.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/bootloader.stripped.elf"  -c shutdown
+	sleep 1
+	sudo openocd -f ./busblaster.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/dct.stripped.elf" -c shutdown
+	sleep 1
+	sudo openocd -f ./busblaster.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.stripped.elf" -c shutdown
 
