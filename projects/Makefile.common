@@ -12,17 +12,17 @@ ARM=$(BSP)/arm/bin/Linux64/
 CC=$(ARM)arm-none-eabi-gcc
 CP=$(ARM)arm-none-eabi-g++
 AR=$(ARM)arm-none-eabi-ar
-STRIP=$(ARM)arm-none-eabi-strip	
+STRIP=$(ARM)arm-none-eabi-strip
 OBJCOPY=$(ARM)arm-none-eabi-objcopy
 
 ######################## DO NOT CHANGE ####################################
 TOBEFIXED= -I$(BSP)/include_security/BESL/include  -I$(BSP)/include_security/BESL/crypto -I$(BSP)/include_security/BESL/host/WICED/
-INCLUDES=-I$(SOURCEDIR) -I$(ROOT_DIR)/../WICED_SRC/WICED $(TOBEFIXED) -I$(BSP)/include -I$(BSP)/include/periph  -I$(BSP)/include/WWD -I$(BSP)/include/WWD/network -I$(BSP)/include/platform -I$(BSP)/include/libraries -I$(BSP)/include/WWD/internal  -I$(BSP)/include/WWD/internal/chips -I$(BSP)/include/RTOS/FreeRTOS -I$(BSP)/include/platform/ARM_CM3 -I$(BSP)/include/RTOS/FreeRTOS/ARM_CM3 -I$(BSP)/include/MXCHIP3162 -I$(BSP)/include/network/lwip -I$(BSP)/include/network/lwip/ipv4 
+INCLUDES=-I$(SOURCEDIR) -I$(ROOT_DIR)/../WICED_SRC/WICED $(TOBEFIXED) -I$(BSP)/include -I$(BSP)/include/periph  -I$(BSP)/include/WWD -I$(BSP)/include/WWD/network -I$(BSP)/include/platform -I$(BSP)/include/libraries -I$(BSP)/include/WWD/internal  -I$(BSP)/include/WWD/internal/chips -I$(BSP)/include/RTOS/FreeRTOS -I$(BSP)/include/platform/ARM_CM3 -I$(BSP)/include/RTOS/FreeRTOS/ARM_CM3 -I$(BSP)/include/MXCHIP3162 -I$(BSP)/include/network/lwip -I$(BSP)/include/network/lwip/ipv4
 DEFINES=-DPLATFORM=\"MXCHIP3162\"
-CCFLAGS=$(DEFINES) -isystem $(ARM)/../../include -isystem $(ARM)/../../lib/include -isystem $(ARM)/../../lib/include-fixed -c  -MD -mthumb -mcpu=cortex-m3    -mlittle-endian   -Wall -fsigned-char -ffunction-sections -fdata-sections -fno-common $(INCLUDES) -DNDEBUG -ggdb -O3 
+CCFLAGS=$(DEFINES) -isystem $(ARM)/../../include -isystem $(ARM)/../../lib/include -isystem $(ARM)/../../lib/include-fixed -c  -MD -mthumb -mcpu=cortex-m3    -mlittle-endian   -Wall -fsigned-char -ffunction-sections -fdata-sections -fno-common $(INCLUDES) -DNDEBUG -ggdb -O3
 LIBRARYLIST=./bsp/link.opts
 LDFLAGS=-L$(BSP)/ld/  -T$(BSP)/ld/app_with_bootloader.ld
-CCLINKFLAGS=-Wl,--gc-sections -Wl,-O3 -mthumb -mcpu=cortex-m3 -Wl,-A,thumb -mlittle-endian -nostartfiles -Wl,--defsym,__STACKSIZE__=800 $(LDFLAGS) -Wl,--start-group  bsp/lib/*.o bsp/lib/*.a 
+CCLINKFLAGS=-Wl,--gc-sections -Wl,-O3 -mthumb -mcpu=cortex-m3 -Wl,-A,thumb -mlittle-endian -nostartfiles -Wl,--defsym,__STACKSIZE__=800 $(LDFLAGS) -Wl,--start-group  bsp/lib/*.o bsp/lib/*.a
 
 SRCS=$(shell find $(SOURCEDIR) -name '*.c')
 SRCS := $(SRCS:%.c=%.o)
@@ -47,7 +47,7 @@ app: $(BINARY_FINAL)
 clean:
 	rm -rf ./bin
 	rm -rf ./build
-	
+
 
 ############## DCT BUILD ####################
 $(DCT_BINARY_FINAL): $(DCT_BINARY_STRIPPED)
@@ -57,9 +57,9 @@ $(DCT_BINARY_FINAL): $(DCT_BINARY_STRIPPED)
 $(DCT_BINARY_STRIPPED): $(DCT_BINARY)
 	$(STRIP) -o $@ $(STRIPFLAGS) $<
 
-$(DCT_BINARY): $(DCT_OBJECT) 
+$(DCT_BINARY): $(DCT_OBJECT)
 	$(CP)  --static -Wl,-static -Wl,--warn-common -Wl,--gc-sections -Wl,-O3 -Wl,--cref  -mthumb -mcpu=cortex-m3 -Wl,-A,thumb -mlittle-endian -nostartfiles -Wl,--defsym,__STACKSIZE__=800 -L $(ROOT_DIR)/../WICED_SRC/WICED/platform/MCU/STM32F2xx/GCC -L $(ROOT_DIR)/../WICED_SRC/WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5 -Wl,-T $(ROOT_DIR)/../WICED_SRC/WICED/platform/MCU/STM32F2xx/GCC/STM32F2x5/dct.ld -Wl,-Map,$(BUILDDIR)/dct/DCT.map -o $(DCT_BINARY) $(DCT_OBJECT)
-	
+
 $(BUILDDIR)/dct/%.o: $(DCT_SRC)
 	@mkdir -p $(@D)
 	$(CC) -DBOOTLOADER_MAGIC_NUMBER=0x4d435242 $(CCFLAGS) -DWIFI_CONFIG_APPLICATION_DEFINED -DWIFI_CONFIG_DCT_H="$(WIFI_HEADER)"-DDEBUG -ggdb -O0 -Wall -fsigned-char -ffunction-sections -fdata-sections -fno-common -o $@ $<
@@ -67,16 +67,16 @@ $(BUILDDIR)/dct/%.o: $(DCT_SRC)
 
 
 ####### Normal .c build #########
-$(BINARY_FINAL): $(BINARY_STRIPPED) 
+$(BINARY_FINAL): $(BINARY_STRIPPED)
 	$(OBJCOPY) -O binary -R .eh_frame -R .init -R .fini -R .comment -R .ARM.attributes $< $@
 
 $(BINARY_STRIPPED): $(BINARY)
 	$(STRIP) -o $@ $(STRIPFLAGS) $<
 
-$(BINARY): $(RESOURCE_H) $(OBJECTS) 
+$(BINARY): $(RESOURCE_H) $(OBJECTS)
 	@mkdir -p bin
 	echo $(OBJECTS)
-	$(CC) $(CCLINKFLAGS) $(OBJECTS) -Wl,--end-group  -o $(BINARY) 
+	$(CC) $(CCLINKFLAGS) $(OBJECTS) -Wl,--end-group  -o $(BINARY)
 	cp $(BSP)/bin/waf_bootloader-NoOS-NoNS-EMW3162-SDIO.stripped.elf ./bin/bootloader.stripped.elf
 	cp $(BSP)/bin/waf_bootloader-NoOS-NoNS-EMW3162-SDIO.elf ./bin/bootloader.elf
 	cp $(BSP)/bin/waf_bootloader-NoOS-NoNS-EMW3162-SDIO.bin ./bin/bootloader.bin
@@ -102,18 +102,18 @@ $(RESOURCE_A): $(RESOURCES) $(RESOURCES_HTML_C) $(RESOURCES_PNG_C)
 $(BUILDDIR)/%.png.c: %.png
 	@mkdir -p $(@D)
 	 perl $(BSP)/tools/text_to_c/bin_to_resource_c.pl MEM $(call create_name, $@) $< > $@
-	
+
 $(BUILDDIR)/%.png.o: $(RESOURCES_PNG_C)
 	$(CC) $(CCFLAGS) -o $@ $<
-	
-	
+
+
 $(BUILDDIR)/%.html.c: %.html
 	@mkdir -p $(@D)
 	 perl $(BSP)/tools/text_to_c/text_to_resource_c.pl MEM $(call create_name, $@) $< > $@
 
 $(BUILDDIR)/%.html.o: $(RESOURCES_HTML_C)
 	$(CC) $(CCFLAGS) -o $@ $<
-	
+
 
 download: download_jlink
 
@@ -124,6 +124,14 @@ download_jlink: $(BINARY_FINAL)
 	sudo openocd -f ./jlink.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/dct.stripped.elf" -c shutdown
 	sleep 1
 	sudo openocd -f ./jlink.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.stripped.elf" -c shutdown
+
+
+download_stlink: $(BINARY_FINAL)
+	sudo openocd -f ./stlinkv2.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/bootloader.stripped.elf"  -c shutdown
+	sleep 1
+	sudo openocd -f ./stlinkv2.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/dct.stripped.elf" -c shutdown
+	sleep 1
+	sudo openocd -f ./stlinkv2.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.stripped.elf" -c shutdown
 
 
 download_bus: $(BINARY_FINAL)
@@ -140,4 +148,3 @@ download_busblaster: $(BINARY_FINAL)
 	sudo openocd -f ./busblaster.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/dct.stripped.elf" -c shutdown
 	sleep 1
 	sudo openocd -f ./busblaster.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.stripped.elf" -c shutdown
-
