@@ -1,0 +1,35 @@
+
+download: download_jlink
+
+######### flash utils ##############3
+download_jlink: $(BINARY_FINAL)
+	sudo openocd -f ./jlink.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/bootloader.stripped.elf"  -c shutdown
+	sleep 1
+	sudo openocd -f ./jlink.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/dct.stripped.elf" -c shutdown
+	sleep 1
+	sudo openocd -f ./jlink.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.stripped.elf" -c shutdown
+
+
+download_stlink: $(BINARY_FINAL)
+	sudo openocd -f ./stlinkv2.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/bootloader.stripped.elf"  -c shutdown
+	sleep 1
+	sudo openocd -f ./stlinkv2.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/dct.stripped.elf" -c shutdown
+	sleep 1
+	sudo openocd -f ./stlinkv2.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.stripped.elf" -c shutdown
+
+
+download_bus: $(BINARY_FINAL)
+	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/bootloader.stripped.elf"  -c shutdown
+	sleep 1
+	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/dct.stripped.elf" -c shutdown
+	sleep 1
+	sudo openocd -f ./bus.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.stripped.elf" -c shutdown
+
+
+download_busblaster: $(BINARY_FINAL)
+	sudo openocd -f ./busblaster.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/bootloader.stripped.elf"  -c shutdown
+	sleep 1
+	sudo openocd -f ./busblaster.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/dct.stripped.elf" -c shutdown
+	sleep 1
+	sudo openocd -f ./busblaster.cfg -c "init" -c "halt" -c "flash write_image erase ./bin/out.stripped.elf" -c shutdown
+
