@@ -38,14 +38,11 @@ RESOURCE_H :=bsp/include/resources.h ### DO NOT RENAME THIS, OVERWRITES THE RESO
 
 ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-include $(ROOT_DIR)/../tools/Makefile.targets
-
-all: $(BINARY_FINAL) $(DCT_BINARY_FINAL) test
+all: $(BINARY_FINAL) $(DCT_BINARY_FINAL)
 dct: $(DCT_BINARY_FINAL)
 app: $(BINARY_FINAL)
 
-test:	download_test
-	echo $(ROOT_DIR)/../tools
+include $(ROOT_DIR)/../tools/Makefile.targets
 
 clean:
 	rm -rf ./bin
