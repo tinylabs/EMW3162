@@ -19,7 +19,8 @@ BUFFER_SIZE = 1024
 MESSAGE = "Hello Wiced!"
 
 # IP details for the WICED TCP server
-DEFAULT_IP   = '172.16.61.243'   # IP address of the WICED TCP server
+#DEFAULT_IP   = '172.16.61.243'   # IP address of the WICED TCP server
+DEFAULT_IP   = '192.168.1.76'   # IP address of the WICED TCP server
 DEFAULT_PORT = 50007             # Port of the WICED TCP server
 
 DEFAULT_KEEP_ALIVE = 0           # Keep the connection alive (=1), or close the connection (=0)
